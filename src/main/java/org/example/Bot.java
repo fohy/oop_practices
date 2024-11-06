@@ -9,7 +9,6 @@ public class Bot extends TelegramLongPollingBot {
     private QuestionManager questionManager;
 
     public Bot() {
-        // Инициализируем все необходимые компоненты
         this.questionManager = new QuestionManager();
         this.dialogueManager = new DialogueManager(questionManager);
     }
@@ -30,19 +29,8 @@ public class Bot extends TelegramLongPollingBot {
         if (msg != null && msg.hasText()) {
             String userMessage = msg.getText();
 
-            // Логика для обработки /start и других команд
-            SendMessage response = new SendMessage();
-            response.setChatId(msg.getChatId().toString());
-
-            // Команды /start и /help
-            if (userMessage.equalsIgnoreCase("/start")) {
-                response.setText("Привет, я бот! Я буду задавать тебе вопросы. Введи /help для справки.");
-            } else if (userMessage.equalsIgnoreCase("/help")) {
-                response.setText("Команды:\n/start - начать общение с ботом\n/help - получить справку");
-            } else {
-                // Обработка диалога
-                response = dialogueManager.processMessage(msg);
-            }
+            // Обработка команд /start, /help и ответов на вопросы
+            SendMessage response = dialogueManager.processMessage(msg);
 
             try {
                 // Отправка ответа пользователю

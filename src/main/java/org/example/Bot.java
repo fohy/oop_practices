@@ -26,6 +26,9 @@ public class Bot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         var msg = update.getMessage();
+        var user = msg.getFrom();
+
+        System.out.println(user.getFirstName() + " wrote " + msg.getText());
         if (msg != null && msg.hasText()) {
             String userMessage = msg.getText();
 

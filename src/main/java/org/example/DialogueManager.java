@@ -25,7 +25,11 @@ public class DialogueManager {
         response.setChatId(msg.getChatId().toString());
 
         switch (userMessage.toLowerCase()) {
-            case "/rules":
+            case "/stop":
+                response.setText("Ну не справился и не справился, с кем не бывает (петушара бездарный)\nтык на /start чтоб начать заново");
+                questionManager.reset();
+                break;
+            case "/descript":
                 response.setText("Бот будет отправлять тебе вопросы, твоя задача постараться правильно на них ответить\nА может негр ебаный мне тут рэп не исполнять?");
                 break;
             case "/start":

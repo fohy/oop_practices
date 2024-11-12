@@ -6,11 +6,13 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 public class Bot extends TelegramLongPollingBot {
     private DialogueManager dialogueManager;
-    private QuestionManager questionManager;
+    private GameSession gameSession;
+    private KeyboardManager keyboardManager;
 
     public Bot() {
-        this.questionManager = new QuestionManager();
-        this.dialogueManager = new DialogueManager(questionManager);
+        this.keyboardManager = new KeyboardManager();
+        this.gameSession = new GameSession(new QuestionManager());
+        this.dialogueManager = new DialogueManager(gameSession, keyboardManager);
     }
 
     @Override
@@ -26,17 +28,9 @@ public class Bot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         var msg = update.getMessage();
-        var user = msg.getFrom();
-
-        System.out.println(user.getFirstName() + " wrote " + msg.getText());
         if (msg != null && msg.hasText()) {
-            String userMessage = msg.getText();
-
-            // Обработка команд /start, /help и ответов на вопросы
             SendMessage response = dialogueManager.processMessage(msg);
-
             try {
-                // Отправка ответа пользователю
                 execute(response);
             } catch (Exception e) {
                 e.printStackTrace();

@@ -6,23 +6,21 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 public class Bot extends TelegramLongPollingBot {
     private DialogueManager dialogueManager;
-    private GameSession gameSession;
     private KeyboardManager keyboardManager;
 
     public Bot() {
         this.keyboardManager = new KeyboardManager();
-        this.gameSession = new GameSession(new QuestionManager());
-        this.dialogueManager = new DialogueManager(gameSession, keyboardManager);
+        this.dialogueManager = new DialogueManager(keyboardManager);
     }
 
     @Override
     public String getBotUsername() {
-        return "StudyProject_Bot";  // Имя бота
+        return "StudyProject_Bot";
     }
 
     @Override
     public String getBotToken() {
-        return "7756968278:AAFYiGjm-zTzluV2v_uHRLnzvWDI6EG_dh8";  // Токен бота
+        return "7756968278:AAFYiGjm-zTzluV2v_uHRLnzvWDI6EG_dh8";
     }
 
     @Override

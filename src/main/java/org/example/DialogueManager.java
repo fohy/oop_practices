@@ -5,30 +5,35 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
-public class DialogueManager {
-    private GameSession gameSession;
-    private KeyboardManager keyboardManager;
+import java.util.HashMap;
+import java.util.Map;
 
-    public DialogueManager(GameSession gameSession, KeyboardManager keyboardManager) {
-        this.gameSession = gameSession;
+public class DialogueManager {
+    private KeyboardManager keyboardManager;
+    private Map<Long, GameSession> userSessions = new HashMap<>();
+
+    public DialogueManager(KeyboardManager keyboardManager) {
         this.keyboardManager = keyboardManager;
     }
 
-    // Метод для обработки сообщений
     public SendMessage processMessage(Message msg) {
+        long chatId = msg.getChatId();
+        GameSession session = userSessions.computeIfAbsent(chatId, k -> {
+            System.out.println("Создаём новую сессию для chatId: " + chatId);
+            return new GameSession(new QuestionManager());
+        });
+
         String userMessage = msg.getText();
         SendMessage response = new SendMessage();
-        response.setChatId(msg.getChatId().toString());
+        response.setChatId(String.valueOf(chatId));
+
+        System.out.println("Получено сообщение от пользователя " + chatId + ": " + userMessage);
 
         switch (userMessage.toLowerCase()) {
             case "/stop":
-                // Отправляем утешительное сообщение пользователю
                 response.setText("Чё сдался да, ну ниче, яйца отрастут - попробуешь ещё раз!");
-
-                // Сбрасываем игровую сессию
-                gameSession.reset();
-                gameSession.endGame();
-                // Показываем клавиатуру с кнопкой "Начать игру"
+                session.reset();
+                session.endGame();
                 response.setReplyMarkup(keyboardManager.createStartGameKeyboard());
                 break;
 
@@ -37,12 +42,10 @@ public class DialogueManager {
                 break;
 
             case "/start":
-                // Команда /start — показываем кнопку для начала игры, если она ещё не началась
-                if (!gameSession.isGameStarted()) {
+                if (!session.isGameStarted()) {
                     response.setText("Привет! Я бот, давай поиграем в игру. Когда будешь готов, нажми 'Начать игру'.");
-
-                    // Показать клавиатуру с кнопкой "Начать игру"
                     response.setReplyMarkup(keyboardManager.createStartGameKeyboard());
+                    System.out.println("Отправляем кнопку 'Начать игру' для chatId: " + chatId);
                 }
                 break;
 
@@ -51,42 +54,39 @@ public class DialogueManager {
                 break;
 
             default:
-                if (userMessage.equals("Начать игру") && !gameSession.isGameStarted()) {
-                    // Начинаем игру
-                    gameSession.startGame();
+                if (userMessage.equals("Начать игру") && !session.isGameStarted()) {
+                    session.startGame();
                     response.setText("Отлично! Начинаем игру!");
+                    ReplyKeyboardRemove removeKeyboard = new ReplyKeyboardRemove();
+                    removeKeyboard.setRemoveKeyboard(true);
+                    response.setReplyMarkup(removeKeyboard);
+                    System.out.println("Игра начинается для chatId: " + chatId);
 
-                    // Убираем клавиатуру после нажатия на "Начать игру"
-                    ReplyKeyboardRemove keyboardRemove = new ReplyKeyboardRemove();
-                    keyboardRemove.setRemoveKeyboard(true);
-                    response.setReplyMarkup(keyboardRemove);
-
-                    // Получаем первый вопрос
-                    Question question = gameSession.getNextQuestion();
+                    Question question = session.getNextQuestion();
                     if (question != null) {
                         response.setText(question.getQuestionText());
+                        System.out.println("Отправляем первый вопрос для chatId: " + chatId);
                     } else {
-                        response.setText("Все вопросы заданы. Введите /start для нового раунда.");
-                        gameSession.reset();  // Если все вопросы заданы, сбрасываем и начинаем заново
+                        response.setText("Ошибка: нет вопросов.");
                     }
                 } else {
-                    // Обработка ответа на вопрос
-                    Question currentQuestion = gameSession.getCurrentQuestion();
+                    Question currentQuestion = session.getCurrentQuestion();
                     if (currentQuestion != null) {
                         if (evaluateAnswer(userMessage, currentQuestion.getCorrectAnswer())) {
-                            gameSession.incrementScore();
+                            session.incrementScore();
                             response.setText("Правильный ответ!");
                         } else {
                             response.setText("Неправильный ответ! Правильный ответ: " + currentQuestion.getCorrectAnswer());
                         }
 
-                        // После ответа на текущий вопрос - следующий
-                        currentQuestion = gameSession.getNextQuestion();
+                        currentQuestion = session.getNextQuestion();
                         if (currentQuestion != null) {
                             response.setText(response.getText() + "\nСледующий вопрос: " + currentQuestion.getQuestionText());
                         } else {
-                            response.setText(response.getText() + "\nВы ответили на все вопросы! Ваш результат: " + gameSession.getScore() + " из " + gameSession.getTotalQuestions());
-                            gameSession.reset();  // Если все вопросы заданы, сбрасываем
+                            response.setText(response.getText() + "\nВы ответили на все вопросы! Ваш результат: " + session.getScore() + " из " + session.getTotalQuestions());
+                            session.reset();
+                            response.setReplyMarkup(keyboardManager.createStartGameKeyboard());
+                            System.out.println("Игра завершена для chatId: " + chatId);
                         }
                     }
                 }
@@ -96,7 +96,6 @@ public class DialogueManager {
         return response;
     }
 
-    // Метод для оценки ответа пользователя
     private boolean evaluateAnswer(String userAnswer, String correctAnswer) {
         return userAnswer.trim().equalsIgnoreCase(correctAnswer.trim());
     }

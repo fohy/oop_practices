@@ -8,7 +8,6 @@ import java.util.Collections;
 
 public class KeyboardManager {
 
-    // Создание клавиатуры для кнопки "Начать игру"
     public ReplyKeyboardMarkup createStartGameKeyboard() {
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         keyboardMarkup.setSelective(true);

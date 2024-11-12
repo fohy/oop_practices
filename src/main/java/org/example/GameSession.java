@@ -1,7 +1,5 @@
 package org.example;
 
-import java.util.Collections;
-
 public class GameSession {
     private QuestionManager questionManager;
     private int score;
@@ -13,14 +11,12 @@ public class GameSession {
         this.gameStarted = false;
     }
 
-    // Начало игры
     public void startGame() {
         gameStarted = true;
-        score = 0; // сбрасываем баллы
-        questionManager.reset(); // сбрасываем вопросы
+        score = 0;
+        questionManager.reset();
     }
 
-    // Завершаем игру
     public void endGame() {
         gameStarted = false;
     }

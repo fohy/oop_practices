@@ -23,7 +23,7 @@ public class QuestionManager {
         this.questions.add(new Question("Как называется химический элемент с символом O?", "Кислород"));
         this.questions.add(new Question("Какой самый большой океан?", "Тихий"));
         this.questions.add(new Question("Какая планета находится ближе всех к Солнцу?", "Меркурий"));
-
+        this.questions.add(new Question("ФИИТ?","сосать"));
         // Перемешиваем вопросы случайным образом
         Collections.shuffle(questions);
     }

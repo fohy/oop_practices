@@ -24,40 +24,48 @@ public class DialogueManager {
         SendMessage response = new SendMessage();
         response.setChatId(msg.getChatId().toString());
 
-        // Если сообщение - это команда /start, начинаем диалог
-        if (userMessage.equalsIgnoreCase("/start")) {
-            response.setText("Привет, я бот! Я буду задавать тебе вопросы. Введи /help для справки.");
-            // Получаем первый вопрос
-            Question question = questionManager.getNextQuestion();
-            if (question != null) {
-                response.setText(question.getQuestionText());
-            } else {
-                response.setText("Все вопросы заданы. Введите /start для нового раунда.");
-                questionManager.reset();  // Если все вопросы заданы, сбрасываем и начинаем заново
-            }
-        } else if (userMessage.equalsIgnoreCase("/help")) {
-            response.setText("Команды:\n/start - начать общение с ботом\n/help - получить справку");
-        } else {
-            // Обработка ответа на вопрос
-            Question currentQuestion = questionManager.getCurrentQuestion();
-            if (currentQuestion != null) {
-                if (evaluateAnswer(userMessage, currentQuestion.getCorrectAnswer())) {
-                    score++; // Увеличиваем баллы за правильный ответ
-                    response.setText("Правильный ответ!");
+        switch (userMessage.toLowerCase()) {
+            case "/rules":
+                response.setText("Бот будет отправлять тебе вопросы, твоя задача постараться правильно на них ответить\nА может негр ебаный мне тут рэп не исполнять?");
+                break;
+            case "/start":
+                response.setText("Привет, я бот! Я буду задавать тебе вопросы. Введи /help для справки.");
+                // Получаем первый вопрос
+                Question question = questionManager.getNextQuestion();
+                if (question != null) {
+                    response.setText(question.getQuestionText());
                 } else {
-                    response.setText("Неправильный ответ! Правильный ответ: " + currentQuestion.getCorrectAnswer());
+                    response.setText("Все вопросы заданы. Введите /start для нового раунда.");
+                    questionManager.reset();  // Если все вопросы заданы, сбрасываем и начинаем заново
                 }
+                break;
 
-                // После ответа на текущий вопрос - следующий
-                currentQuestion = questionManager.getNextQuestion();
+            case "/help":
+                response.setText("Команды:\n/start - начать общение с ботом\n/help - получить справку");
+                break;
+
+            default:
+                // Обработка ответа на вопрос
+                Question currentQuestion = questionManager.getCurrentQuestion();
                 if (currentQuestion != null) {
-                    response.setText(response.getText() + "\nСледующий вопрос: " + currentQuestion.getQuestionText());
-                } else {
-                    response.setText(response.getText() + "\nВы ответили на все вопросы! Ваш результат: " + score + " из " + questionManager.getTotalQuestions());
-                    questionManager.reset();  // Если все вопросы заданы, сбрасываем
-                    score = 0; // Сбрасываем баллы
+                    if (evaluateAnswer(userMessage, currentQuestion.getCorrectAnswer())) {
+                        score++; // Увеличиваем баллы за правильный ответ
+                        response.setText("Правильный ответ!");
+                    } else {
+                        response.setText("Неправильный ответ! Правильный ответ: " + currentQuestion.getCorrectAnswer());
+                    }
+
+                    // После ответа на текущий вопрос - следующий
+                    currentQuestion = questionManager.getNextQuestion();
+                    if (currentQuestion != null) {
+                        response.setText(response.getText() + "\nСледующий вопрос: " + currentQuestion.getQuestionText());
+                    } else {
+                        response.setText(response.getText() + "\nВы ответили на все вопросы! Ваш результат: " + score + " из " + questionManager.getTotalQuestions());
+                        questionManager.reset();  // Если все вопросы заданы, сбрасываем
+                        score = 0; // Сбрасываем баллы
+                    }
                 }
-            }
+                break;
         }
 
         return response;

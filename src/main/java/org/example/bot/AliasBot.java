@@ -28,14 +28,14 @@ public class AliasBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        // Получаем сообщение от пользователя
+
         String userMessage = update.getMessage().getText();
         Long chatId = update.getMessage().getChatId();
         System.out.print(chatId.toString() + " написал: " + userMessage + "\n");
-        // Обработка команды с помощью TelegramCommandHandler
+
         SendMessage response = commandHandler.handleCommand(userMessage, chatId);
 
-        // Отправляем ответ пользователю
+
         try {
             execute(response);
         } catch (Exception e) {

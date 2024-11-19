@@ -8,7 +8,6 @@ import java.util.List;
 
 public class KeyboardHelper {
 
-    // Клавиатура для начала игры
     public static ReplyKeyboardMarkup createStartKeyboard() {
         ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
         markup.setResizeKeyboard(true);
@@ -22,7 +21,6 @@ public class KeyboardHelper {
         return markup;
     }
 
-    // Клавиатура для игры (Следующее, пропустить, закончить игру)
     public static ReplyKeyboardMarkup createGameKeyboard() {
         ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
         markup.setResizeKeyboard(true);
@@ -45,7 +43,6 @@ public class KeyboardHelper {
         return markup;
     }
 
-    // Клавиатура для выбора темы игры
     public static ReplyKeyboardMarkup createThemeSelectionKeyboard() {
         ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
         markup.setResizeKeyboard(true);
@@ -68,7 +65,6 @@ public class KeyboardHelper {
         return markup;
     }
 
-    // Клавиатура для новой игры
     public static ReplyKeyboardMarkup createNewGameKeyboard() {
         ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
         markup.setResizeKeyboard(true);

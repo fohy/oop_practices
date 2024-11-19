@@ -5,40 +5,36 @@ import java.util.List;
 
 public class GameState {
 
-    private List<String> words;  // Список слов для игры
-    private int currentWordIndex;  // Индекс текущего слова
-    private int score;  // Количество очков
-    private int round;  // Номер раунда
-    private boolean gameOver;  // Флаг завершения игры
-    private String currentTheme;  // Тема текущей игры
+    private List<String> words;
+    private int currentWordIndex;
+    private int score;
+    private int round;
+    private boolean gameOver;
+    private String currentTheme;
 
-    private static final int MAX_ROUNDS = 3;  // Максимальное количество раундов
 
-    // Конструктор по умолчанию
+
     public GameState() {
         this.words = new ArrayList<>();
         this.currentWordIndex = 0;
         this.score = 0;
         this.round = 1;
         this.gameOver = false;
-        this.currentTheme = "Технологии";  // По умолчанию начинаем с темы "Технологии"
-        initializeWords();  // Инициализируем слова для текущей темы
+        this.currentTheme = "Технологии";
+        initializeWords();
     }
 
-    // Метод для выбора темы
     public void selectTheme(String theme) {
         this.currentTheme = theme;
-        initializeWords();  // Переинициализируем список слов для выбранной темы
+        initializeWords();
     }
 
-    // Получение текущей темы
     public String getCurrentTheme() {
         return currentTheme;
     }
 
-    // Метод для инициализации списка слов в зависимости от выбранной темы
     private void initializeWords() {
-        words.clear();  // Очистка списка слов
+        words.clear();
         switch (currentTheme) {
             case "Технологии":
                 words.add("Программирование");
@@ -59,12 +55,11 @@ public class GameState {
                 words.add("Молоко");
                 break;
             default:
-                words.add("Ошибка");  // В случае, если тема не выбрана
+                words.add("Ошибка");
                 break;
         }
     }
 
-    // Старт игры, возвращает первое слово из списка
     public String startGame() {
         if (currentWordIndex < words.size()) {
             return words.get(currentWordIndex);
@@ -73,14 +68,12 @@ public class GameState {
         }
     }
 
-    // Переход к следующему слову и начисление очков за правильное решение
     public String nextWord(boolean isCorrect) {
         if (isCorrect) {
-            score++;  // Увеличиваем счет за правильный ответ
+            score++;
         }
-        currentWordIndex++;  // Переходим к следующему слову
+        currentWordIndex++;
 
-        // Если все слова пройдены, завершаем игру
         if (currentWordIndex >= words.size()) {
             gameOver = true;
             return "Игра завершена! Ваши очки: " + score;
@@ -88,7 +81,6 @@ public class GameState {
         return words.get(currentWordIndex);
     }
 
-    // Пропуск слова
     public String skipWord() {
         currentWordIndex++;  // Переходим к следующему слову
         if (currentWordIndex >= words.size()) {
@@ -97,26 +89,22 @@ public class GameState {
         return words.get(currentWordIndex);
     }
 
-    // Завершение игры, сбрасывает состояние игры
     public void resetGame() {
         this.currentWordIndex = 0;
         this.score = 0;
         this.round = 1;
         this.gameOver = false;
-        initializeWords();  // Переинициализируем слова
+        initializeWords();
     }
 
-    // Получение текущего счета
     public int getScore() {
         return score;
     }
 
-    // Получение флага завершения игры
     public boolean isGameOver() {
         return gameOver;
     }
 
-    // Получение текущего раунда
     public int getRound() {
         return round;
     }

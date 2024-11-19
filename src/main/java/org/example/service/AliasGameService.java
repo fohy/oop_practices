@@ -1,69 +1,63 @@
 package org.example.service;
 
-import org.example.service.GameState;
-
 import java.util.HashMap;
 import java.util.Map;
 
 public class AliasGameService {
 
-    private final Map<Long, GameState> gameStates;
+    private Map<Long, GameState> gameStates = new HashMap<>();  // Хранение состояний игр по chatId
 
-    public AliasGameService() {
-        this.gameStates = new HashMap<>();
-    }
-
-    public void startNewGame(Long chatId) {
-        this.gameStates.put(chatId, new GameState());
-    }
-
-    public void selectTheme(Long chatId, String theme) {
-        GameState gameState = getGameState(chatId);
-        if (gameState != null) {
-            gameState.selectTheme(theme);
-        }
-    }
-
-    public String startGame(Long chatId) {
-        GameState gameState = getGameState(chatId);
-        if (gameState != null) {
-            return gameState.startGame();
-        }
-        return "Ошибка: Игра не была инициализирована.";
-    }
-
-    public String nextWord(Long chatId, boolean isCorrect) {
-        GameState gameState = getGameState(chatId);
-        if (gameState != null) {
-            return gameState.nextWord(isCorrect);
-        }
-        return "Ошибка: Игра не была инициализирована.";
-    }
-
-    public String skipWord(Long chatId) {
-        GameState gameState = getGameState(chatId);
-        if (gameState != null) {
-            return gameState.skipWord();
-        }
-        return "Ошибка: Игра не была инициализирована.";
-    }
-
-    public void resetGame(Long chatId) {
-        GameState gameState = getGameState(chatId);
-        if (gameState != null) {
-            gameState.resetGame();
-        }
-    }
-
+    // Метод для получения состояния игры по chatId
     public GameState getGameState(Long chatId) {
         return gameStates.get(chatId);
     }
 
-    public int getScore(Long chatId) {
-        GameState gameState = getGameState(chatId);
+    // Метод для начала новой игры
+    public void startNewGame(Long chatId) {
+        gameStates.put(chatId, new GameState());  // Инициализируем новую игру для chatId
+    }
+
+    // Метод для завершения игры
+    public void endGame(Long chatId) {
+        GameState gameState = gameStates.get(chatId);
         if (gameState != null) {
-            return gameState.getScore();
+            gameState.endGame();  // Завершаем игру в GameState
         }
-        return 0;
+    }
+
+    // Метод для старта игры
+    public String startGame(Long chatId) {
+        GameState gameState = gameStates.get(chatId);
+        if (gameState == null) {
+            startNewGame(chatId);  // Если игра не начата, начинаем новую
+            gameState = gameStates.get(chatId);
+        }
+        return gameState.startGame();
+    }
+
+    // Метод для получения следующего слова
+    public String nextWord(Long chatId, boolean isCorrect) {
+        GameState gameState = gameStates.get(chatId);
+        if (gameState == null || gameState.isGameOver()) {
+            return "";  // Если игры нет или она завершена
+        }
+        return gameState.nextWord(isCorrect);
+    }
+
+    // Метод для пропуска слова
+    public String skipWord(Long chatId) {
+        GameState gameState = gameStates.get(chatId);
+        if (gameState == null || gameState.isGameOver()) {
+            return "";  // Если игры нет или она завершена
+        }
+        return gameState.skipWord();
+    }
+
+    // Метод для выбора темы
+    public void selectTheme(Long chatId, String theme) {
+        GameState gameState = gameStates.get(chatId);
+        if (gameState != null) {
+            gameState.selectTheme(theme);  // Обновляем тему в состоянии игры
+        }
     }
 }

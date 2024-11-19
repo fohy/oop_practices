@@ -32,7 +32,6 @@ public class AliasBot extends TelegramLongPollingBot {
         String userMessage = update.getMessage().getText();
         Long chatId = update.getMessage().getChatId();
         System.out.print(chatId.toString() + " написал: " + userMessage + "\n");
-
         SendMessage response = commandHandler.handleCommand(userMessage, chatId);
 
 

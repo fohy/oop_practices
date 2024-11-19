@@ -5,36 +5,37 @@ import java.util.List;
 
 public class GameState {
 
-    private List<String> words;
-    private int currentWordIndex;
-    private int score;
-    private int round;
-    private boolean gameOver;
-    private String currentTheme;
+    private List<String> words;  // Список слов для игры
+    private int currentWordIndex;  // Индекс текущего слова
+    private int score;  // Количество очков
+    private boolean gameOver;  // Флаг завершения игры
+    private String currentTheme;  // Тема текущей игры
 
-
+    private static final int MAX_ROUNDS = 3;  // Максимальное количество раундов
 
     public GameState() {
         this.words = new ArrayList<>();
         this.currentWordIndex = 0;
         this.score = 0;
-        this.round = 1;
         this.gameOver = false;
-        this.currentTheme = "Технологии";
-        initializeWords();
+        this.currentTheme = "Технологии";  // По умолчанию начинаем с темы "Технологии"
+        initializeWords();  // Инициализируем слова для текущей темы
     }
 
+    // Метод для выбора темы
     public void selectTheme(String theme) {
         this.currentTheme = theme;
-        initializeWords();
+        initializeWords();  // Переинициализируем список слов для выбранной темы
     }
 
+    // Получение текущей темы
     public String getCurrentTheme() {
         return currentTheme;
     }
 
+    // Метод для инициализации списка слов в зависимости от выбранной темы
     private void initializeWords() {
-        words.clear();
+        words.clear();  // Очистка списка слов
         switch (currentTheme) {
             case "Технологии":
                 words.add("Программирование");
@@ -49,31 +50,42 @@ public class GameState {
                 words.add("Лев");
                 break;
             case "Еда":
-                words.add("Яблоко");
                 words.add("Пицца");
-                words.add("Хлеб");
-                words.add("Молоко");
-                break;
-            default:
-                words.add("Ошибка");
+                words.add("Бургер");
+                words.add("Паста");
                 break;
         }
     }
 
+    // Начало новой игры
     public String startGame() {
-        if (currentWordIndex < words.size()) {
-            return words.get(currentWordIndex);
-        } else {
-            return "Все слова закончились!";
-        }
+        this.currentWordIndex = 0;
+        this.score = 0;
+        this.gameOver = false;
+        return words.get(currentWordIndex);  // Возвращаем первое слово
     }
 
+    // Метод для получения следующего слова
     public String nextWord(boolean isCorrect) {
+        if (gameOver) return "Игра завершена!";
+
         if (isCorrect) {
             score++;
         }
-        currentWordIndex++;
 
+        currentWordIndex++;
+        if (currentWordIndex >= words.size()) {
+            gameOver = true;
+            return "Игра завершена! Ваши очки: " + score;
+        }
+
+        return words.get(currentWordIndex);
+    }
+
+    // Пропуск слова
+    public String skipWord() {
+        if (gameOver) return "Игра завершена!";
+        currentWordIndex++;
         if (currentWordIndex >= words.size()) {
             gameOver = true;
             return "Игра завершена! Ваши очки: " + score;
@@ -81,22 +93,7 @@ public class GameState {
         return words.get(currentWordIndex);
     }
 
-    public String skipWord() {
-        currentWordIndex++;  // Переходим к следующему слову
-        if (currentWordIndex >= words.size()) {
-            return "Все слова закончились!";
-        }
-        return words.get(currentWordIndex);
-    }
-
-    public void resetGame() {
-        this.currentWordIndex = 0;
-        this.score = 0;
-        this.round = 1;
-        this.gameOver = false;
-        initializeWords();
-    }
-
+    // Получение текущего счета
     public int getScore() {
         return score;
     }
@@ -105,7 +102,15 @@ public class GameState {
         return gameOver;
     }
 
-    public int getRound() {
-        return round;
+    // Сброс игры
+    public void resetGame() {
+        this.currentWordIndex = 0;
+        this.score = 0;
+        this.gameOver = false;
+        initializeWords();  // Переинициализируем слова
+    }
+    public void endGame() {
+        this.gameOver = true;  // Завершаем игру
+        this.currentWordIndex = words.size();  // Можно установить текущий индекс в конец списка слов
     }
 }

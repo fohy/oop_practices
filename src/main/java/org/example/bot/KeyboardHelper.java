@@ -1,6 +1,7 @@
 package org.example.bot;
 
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
 import java.util.ArrayList;
@@ -8,73 +9,41 @@ import java.util.List;
 
 public class KeyboardHelper {
 
-    public static ReplyKeyboardMarkup createStartKeyboard() {
-        ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
-        markup.setResizeKeyboard(true);
+    // Helper method to create a keyboard
+    private static ReplyKeyboardMarkup createKeyboard(List<String> buttonLabels) {
+        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+        KeyboardRow keyboardButtonsRow = new KeyboardRow();  // Используем KeyboardRow вместо List<KeyboardButton>
 
+        // Добавляем кнопки в текущий ряд
+        for (String label : buttonLabels) {
+            keyboardButtonsRow.add(new KeyboardButton(label));
+        }
+
+        // Создаем клавиатуру
         List<KeyboardRow> keyboard = new ArrayList<>();
-        KeyboardRow row = new KeyboardRow();
-        row.add("Начать игру");
-        keyboard.add(row);
+        keyboard.add(keyboardButtonsRow);
 
-        markup.setKeyboard(keyboard);
-        return markup;
+        keyboardMarkup.setKeyboard(keyboard);
+        return keyboardMarkup;
     }
 
-    public static ReplyKeyboardMarkup createGameKeyboard() {
-        ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
-        markup.setResizeKeyboard(true);
-
-        List<KeyboardRow> keyboard = new ArrayList<>();
-
-        KeyboardRow row1 = new KeyboardRow();
-        row1.add("Следующее");
-        keyboard.add(row1);
-
-        KeyboardRow row2 = new KeyboardRow();
-        row2.add("Пропустить");
-        keyboard.add(row2);
-
-        KeyboardRow row3 = new KeyboardRow();
-        row3.add("Закончить игру");
-        keyboard.add(row3);
-
-        markup.setKeyboard(keyboard);
-        return markup;
-    }
-
+    // Клавиатура для начала игры
     public static ReplyKeyboardMarkup createThemeSelectionKeyboard() {
-        ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
-        markup.setResizeKeyboard(true);
-
-        List<KeyboardRow> keyboard = new ArrayList<>();
-
-        KeyboardRow row1 = new KeyboardRow();
-        row1.add("Технологии");
-        keyboard.add(row1);
-
-        KeyboardRow row2 = new KeyboardRow();
-        row2.add("Животные");
-        keyboard.add(row2);
-
-        KeyboardRow row3 = new KeyboardRow();
-        row3.add("Еда");
-        keyboard.add(row3);
-
-        markup.setKeyboard(keyboard);
-        return markup;
+        return createKeyboard(List.of("Технологии", "Животные", "Еда"));
     }
 
+    // Клавиатура для игры
+    public static ReplyKeyboardMarkup createGameKeyboard() {
+        return createKeyboard(List.of("Следующее", "Пропустить", "Начать новую игру"));
+    }
+
+    // Клавиатура для новой игры
     public static ReplyKeyboardMarkup createNewGameKeyboard() {
-        ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
-        markup.setResizeKeyboard(true);
+        return createKeyboard(List.of("Начать новую игру"));
+    }
 
-        List<KeyboardRow> keyboard = new ArrayList<>();
-        KeyboardRow row = new KeyboardRow();
-        row.add("Начать новую игру");
-        keyboard.add(row);
-
-        markup.setKeyboard(keyboard);
-        return markup;
+    // Клавиатура для старта
+    public static ReplyKeyboardMarkup createStartKeyboard() {
+        return createKeyboard(List.of("Начать игру"));
     }
 }

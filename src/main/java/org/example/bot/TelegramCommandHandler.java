@@ -30,7 +30,9 @@ public class TelegramCommandHandler {
                 response.setText("Привет! Давай играть в Аллиас! Выбери тему для игры.");
                 response.setReplyMarkup(KeyboardHelper.createThemeSelectionKeyboard());
                 break;
-
+            case "/help" :
+                response.setText("Нахуя тебе помощь? Сам разберешься)");
+                break;
             case "/rules":
                 response.setText("Правила игры в Аллиас:\n\n1. Игра состоит из нескольких раундов.\n2. Игроки по очереди отгадывают слово.\n3. За каждое правильное отгаданное слово начисляются очки.");
                 response.setReplyMarkup(KeyboardHelper.createStartKeyboard());

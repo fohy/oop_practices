@@ -82,7 +82,7 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Main-Class>org.example.AliasBot</Main-Class> <!-- Указываем основной класс -->
+                            <Main-Class>org.example.bot.AliasBot</Main-Class> <!-- Указываем основной класс -->
                         </manifestEntries>
                     </archive>
                 </configuration>

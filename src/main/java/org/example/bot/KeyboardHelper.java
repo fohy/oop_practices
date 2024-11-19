@@ -1,7 +1,7 @@
-package org.example;
+package org.example.bot;
 
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,7 @@ public class KeyboardHelper {
         return markup;
     }
 
-    // Клавиатура для игры (Следующее, пропустить)
+    // Клавиатура для игры (Следующее, пропустить, закончить игру)
     public static ReplyKeyboardMarkup createGameKeyboard() {
         ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
         markup.setResizeKeyboard(true);
@@ -37,19 +37,32 @@ public class KeyboardHelper {
         row2.add("Пропустить");
         keyboard.add(row2);
 
+        KeyboardRow row3 = new KeyboardRow();
+        row3.add("Закончить игру");
+        keyboard.add(row3);
+
         markup.setKeyboard(keyboard);
         return markup;
     }
 
-    // Клавиатура для подтверждения продолжения игры
-    public static ReplyKeyboardMarkup createContinueKeyboard() {
+    // Клавиатура для выбора темы игры
+    public static ReplyKeyboardMarkup createThemeSelectionKeyboard() {
         ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
         markup.setResizeKeyboard(true);
 
         List<KeyboardRow> keyboard = new ArrayList<>();
-        KeyboardRow row = new KeyboardRow();
-        row.add("Готово");
-        keyboard.add(row);
+
+        KeyboardRow row1 = new KeyboardRow();
+        row1.add("Технологии");
+        keyboard.add(row1);
+
+        KeyboardRow row2 = new KeyboardRow();
+        row2.add("Животные");
+        keyboard.add(row2);
+
+        KeyboardRow row3 = new KeyboardRow();
+        row3.add("Еда");
+        keyboard.add(row3);
 
         markup.setKeyboard(keyboard);
         return markup;
@@ -68,5 +81,4 @@ public class KeyboardHelper {
         markup.setKeyboard(keyboard);
         return markup;
     }
-
 }

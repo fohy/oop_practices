@@ -104,7 +104,7 @@ public class GameState {
         this.currentWordIndex = 0;
         this.score = 0;
         this.gameOver = false;
-        initializeWords();  // Переинициализируем слова
+        initializeWords();
     }
     public void endGame() {
         this.gameOver = true;

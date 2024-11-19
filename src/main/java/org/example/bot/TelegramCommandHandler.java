@@ -47,7 +47,7 @@ public class TelegramCommandHandler {
                 response.setText(nextWord);
                 assert gameState != null;
                 if (gameState.isGameOver()) {
-                    response.setReplyMarkup(KeyboardHelper.createNewGameKeyboard());  // Кнопка для новой игры
+                    response.setReplyMarkup(KeyboardHelper.createNewGameKeyboard());
                 } else {
                     response.setReplyMarkup(KeyboardHelper.createGameKeyboard());
                 }
@@ -58,7 +58,7 @@ public class TelegramCommandHandler {
                 response.setText(skippedWord);
                 assert gameState != null;
                 if (gameState.isGameOver()) {
-                    response.setReplyMarkup(KeyboardHelper.createNewGameKeyboard());  // Кнопка для новой игры
+                    response.setReplyMarkup(KeyboardHelper.createNewGameKeyboard());
                 } else {
                     response.setReplyMarkup(KeyboardHelper.createGameKeyboard());
                 }

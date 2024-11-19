@@ -5,59 +5,52 @@ import java.util.Map;
 
 public class AliasGameService {
 
-    private Map<Long, GameState> gameStates = new HashMap<>();  // Хранение состояний игр по chatId
+    private Map<Long, GameState> gameStates = new HashMap<>();
 
-    // Метод для получения состояния игры по chatId
     public GameState getGameState(Long chatId) {
         return gameStates.get(chatId);
     }
 
-    // Метод для начала новой игры
     public void startNewGame(Long chatId) {
-        gameStates.put(chatId, new GameState());  // Инициализируем новую игру для chatId
+        gameStates.put(chatId, new GameState());
     }
 
-    // Метод для завершения игры
     public void endGame(Long chatId) {
         GameState gameState = gameStates.get(chatId);
         if (gameState != null) {
-            gameState.endGame();  // Завершаем игру в GameState
+            gameState.endGame();
         }
     }
 
-    // Метод для старта игры
     public String startGame(Long chatId) {
         GameState gameState = gameStates.get(chatId);
         if (gameState == null) {
-            startNewGame(chatId);  // Если игра не начата, начинаем новую
+            startNewGame(chatId);
             gameState = gameStates.get(chatId);
         }
         return gameState.startGame();
     }
 
-    // Метод для получения следующего слова
     public String nextWord(Long chatId, boolean isCorrect) {
         GameState gameState = gameStates.get(chatId);
         if (gameState == null || gameState.isGameOver()) {
-            return "";  // Если игры нет или она завершена
+            return "";
         }
         return gameState.nextWord(isCorrect);
     }
 
-    // Метод для пропуска слова
     public String skipWord(Long chatId) {
         GameState gameState = gameStates.get(chatId);
         if (gameState == null || gameState.isGameOver()) {
-            return "";  // Если игры нет или она завершена
+            return "";
         }
         return gameState.skipWord();
     }
 
-    // Метод для выбора темы
     public void selectTheme(Long chatId, String theme) {
         GameState gameState = gameStates.get(chatId);
         if (gameState != null) {
-            gameState.selectTheme(theme);  // Обновляем тему в состоянии игры
+            gameState.selectTheme(theme);
         }
     }
 }

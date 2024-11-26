@@ -2,15 +2,14 @@ package org.example.bot;
 
 import org.example.service.AliasGameService;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 public class AliasBot extends TelegramLongPollingBot {
-
     private final TelegramCommandHandler commandHandler;
 
     public AliasBot() {
-        this.commandHandler = new TelegramCommandHandler(new AliasGameService());
+        MessageSender messageSender = new TelegramMessageSender(this);  // Передаем ссылку на сам бота
+        this.commandHandler = new TelegramCommandHandler(new AliasGameService(), messageSender);
     }
 
     @Override
@@ -26,13 +25,8 @@ public class AliasBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         String userMessage = update.getMessage().getText();
-        Long chatId = update.getMessage().getChatId();
-        SendMessage response = commandHandler.handleCommand(userMessage, chatId);
-        System.out.println(chatId + " написал(а) : " + userMessage);
-        try {
-            execute(response);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        String chatId = String.valueOf(update.getMessage().getChatId());
+        commandHandler.handleCommand(userMessage, chatId);
+        System.out.println(chatId + " написал(а): " + userMessage);
     }
 }

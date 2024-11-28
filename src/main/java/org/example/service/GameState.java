@@ -1,33 +1,35 @@
 package org.example.service;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class GameState {
-    private List<String> words;
-    private int currentWordIndex;
-    private int score;
-    private boolean gameOver;
-    private String currentTheme;
-    private long startTime; // Время начала игры
-    private int round; // Номер текущего раунда
-    private static final int MAX_ROUNDS = 3; // Максимальное количество раундов
-    private static final long TIME_LIMIT = 60000; // 1 минута в миллисекундах
+    private List<String> words;  // Список слов, загруженных из файла
+    private int score;  // Очки
+    private boolean gameOver;  // Флаг завершения игры
+    private String currentTheme;  // Текущая тема
+    private long startTime;  // Время начала игры
+    private int round;  // Номер текущего раунда
+    private static final int MAX_ROUNDS = 3;  // Максимальное количество раундов
+    private static final long TIME_LIMIT = 60000;  // 1 минута в миллисекундах
 
     public GameState() {
         this.words = new ArrayList<>();
-        this.currentWordIndex = 0;
         this.score = 0;
         this.gameOver = false;
-        this.currentTheme = "Технологии";
+        this.currentTheme = "Технологии";  // По умолчанию
         this.round = 1;  // Начинаем с первого раунда
         initializeWords();
-        this.startTime = System.currentTimeMillis(); // Засекаем время начала игры
+        this.startTime = System.currentTimeMillis();  // Засекаем время начала игры
     }
 
     public void selectTheme(String theme) {
         this.currentTheme = theme;
-        initializeWords();
+        initializeWords();  // Инициализируем слова для выбранной темы
     }
 
     public String getCurrentTheme() {
@@ -35,35 +37,49 @@ public class GameState {
     }
 
     private void initializeWords() {
-        words.clear();
-        switch (currentTheme) {
-            case "Технологии":
-                words.add("Программирование");
-                words.add("Алгоритм");
-                words.add("Дебаг");
-                words.add("Синтаксис");
-                words.add("Компилятор");
-                break;
-            case "Животные":
-                words.add("Кошка");
-                words.add("Птица");
-                words.add("Лев");
-                break;
-            case "Еда":
-                words.add("Пицца");
-                words.add("Бургер");
-                words.add("Паста");
-                break;
+        words.clear();  // Очищаем список слов перед загрузкой новых
+
+        try {
+            switch (currentTheme) {
+                case "Технологии":
+                    words.addAll(loadWordsFromFile("src/main/java/org/example/resources/tech.txt"));
+                    break;
+                case "Животные":
+                    words.addAll(loadWordsFromFile("src/main/java/org/example/resources/animals_words.txt"));
+                    break;
+                case "Еда":
+                    words.addAll(loadWordsFromFile("src/main/java/org/example/resources/food_words.txt"));
+                    break;
+                default:
+                    throw new IllegalArgumentException("Неизвестная тема: " + currentTheme);
+            }
+
+            // Перемешиваем список слов, чтобы они выпадали случайным образом
+            Collections.shuffle(words);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            words.add("Ошибка при загрузке слов.");
         }
     }
 
+    private List<String> loadWordsFromFile(String filePath) throws IOException {
+        List<String> loadedWords = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                loadedWords.add(line.trim());  // Чтение строки и добавление в список
+            }
+        }
+        return loadedWords;
+    }
+
     public String startGame() {
-        this.currentWordIndex = 0;
         this.score = 0;
         this.gameOver = false;
         this.round = 1;  // Начинаем с первого раунда
-        this.startTime = System.currentTimeMillis(); // Обновляем время старта игры
-        return words.get(currentWordIndex);
+        this.startTime = System.currentTimeMillis();  // Обновляем время для нового раунда
+        return getNextWord();  // Возвращаем первое случайное слово
     }
 
     public String nextWord(boolean isCorrect) {
@@ -78,31 +94,40 @@ public class GameState {
         }
 
         if (isCorrect) {
-            score++;
+            score++;  // Увеличиваем счет за правильный ответ
         }
 
-        currentWordIndex++;
-        if (currentWordIndex >= words.size()) {
-            // Переход к следующему раунду
-            startNewRound();
-            return "Раунд " + round + " завершен! Нажмите 'Следующее', чтобы начать следующий раунд.";
+        if (round < MAX_ROUNDS) {
+            return getNextWord();  // Переходим к следующему случайному слову
+        } else {
+            gameOver = true;  // Игра завершена после достижения максимального количества раундов
+            return "Игра завершена! Ваши очки: " + score;
         }
-
-        return words.get(currentWordIndex);
     }
 
     public String skipWord() {
         if (gameOver) {
             return "Игра завершена! Ваши очки: " + score;
         }
-        currentWordIndex++;
-        if (currentWordIndex >= words.size()) {
-            // Переход к следующему раунду
-            startNewRound();
+
+        return getNextWord();  // Переходим к следующему случайному слову
+    }
+
+    private String getNextWord() {
+        if (words.isEmpty()) {
+            return "Нет доступных слов!";
+        }
+
+        // Возвращаем следующее случайное слово из списка
+        String nextWord = words.get(0);
+        words.remove(0);  // Убираем использованное слово из списка
+
+        if (words.isEmpty()) {
+            startNewRound();  // Если все слова использованы, начинаем новый раунд
             return "Раунд " + round + " завершен! Нажмите 'Следующее', чтобы начать следующий раунд.";
         }
 
-        return words.get(currentWordIndex);
+        return nextWord;  // Возвращаем слово
     }
 
     public int getScore() {
@@ -114,23 +139,20 @@ public class GameState {
     }
 
     public void resetGame() {
-        this.currentWordIndex = 0;
         this.score = 0;
         this.gameOver = false;
-        initializeWords();
+        initializeWords();  // Перезагружаем слова
     }
 
     public void endGame() {
         this.gameOver = true;
-        this.currentWordIndex = words.size();
     }
 
     public void startNewRound() {
         if (round < MAX_ROUNDS) {
             round++;
-            this.currentWordIndex = 0;  // Начинаем новый раунд с первого слова
-            this.startTime = System.currentTimeMillis(); // Обновляем время для нового раунда
-            this.gameOver = false;
+            this.startTime = System.currentTimeMillis();  // Обновляем время для нового раунда
+            initializeWords();  // Перезагружаем слова для следующего раунда
         } else {
             this.gameOver = true;  // Заканчиваем игру после 3 раундов
         }

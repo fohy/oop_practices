@@ -8,7 +8,7 @@ public class AliasBot extends TelegramLongPollingBot {
     private final TelegramCommandHandler commandHandler;
 
     public AliasBot() {
-        MessageSender messageSender = new TelegramMessageSender(this);  // Передаем ссылку на сам бота
+        IMessageSender messageSender = new TelegramMessageSender(this);  // Передаем ссылку на сам бота
         this.commandHandler = new TelegramCommandHandler(new AliasGameService(), messageSender);
     }
 

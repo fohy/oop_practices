@@ -5,7 +5,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class TelegramMessageSender implements MessageSender {
+public class TelegramMessageSender implements IMessageSender {
     private final TelegramLongPollingBot bot;
 
     public TelegramMessageSender(TelegramLongPollingBot bot) {

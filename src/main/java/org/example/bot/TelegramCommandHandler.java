@@ -5,9 +5,9 @@ import org.example.service.GameState;
 
 public class TelegramCommandHandler {
     private final AliasGameService gameService;
-    private final MessageSender messageSender;
+    private final IMessageSender messageSender;
 
-    public TelegramCommandHandler(AliasGameService gameService, MessageSender messageSender) {
+    public TelegramCommandHandler(AliasGameService gameService, IMessageSender messageSender) {
         this.gameService = gameService;
         this.messageSender = messageSender;
     }
@@ -38,11 +38,7 @@ public class TelegramCommandHandler {
                 // Справка по командам
                 responseMessage = "Бог поможет! Используй команды:\n" +
                         "/start - начать новую игру\n" +
-                        "/rules - показать правила игры\n" +
-                        "технологии, животные, еда - выбрать тему для игры\n" +
-                        "начать игру - начать игру с выбранной темой\n" +
-                        "следующее - переход к следующему слову\n" +
-                        "пропустить - пропустить слово";
+                        "/rules - показать правила игры\n";
                 break;
 
             case "/rules":
@@ -118,7 +114,7 @@ public class TelegramCommandHandler {
 
             default:
                 // Обработка неизвестной команды
-                responseMessage = "Неизвестная команда. Используйте /help для получения справки.";
+                responseMessage = "Чего блять? Используй /help для получения справки.";
                 break;
         }
 

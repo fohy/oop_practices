@@ -27,7 +27,7 @@ public class TelegramCommandHandler {
             case "/start":
                 gameService.startNewGame(Long.parseLong(chatId));
                 responseMessage = "Привет! Выберите команду и тему игры:\n";
-                replyMarkup = KeyboardHelper.createTeamAndThemeSelectionKeyboard();
+                replyMarkup = KeyboardHelper.createTeamSelectionKeyboard();
                 break;
 
             case "ежиная перхоть":

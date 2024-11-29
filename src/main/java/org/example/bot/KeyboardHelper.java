@@ -1,71 +1,81 @@
 package org.example.bot;
 
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class KeyboardHelper {
+    public static ReplyKeyboardMarkup createTeamAndThemeSelectionKeyboard() {
+        List<KeyboardRow> rows = new ArrayList<>();
 
-    // Пример корректной клавиатуры с кнопками
-    public static ReplyKeyboardMarkup createThemeSelectionKeyboard() {
+        // Клавиатура для выбора команды
+        KeyboardRow row1 = new KeyboardRow();
+        row1.add("Ежиная перхоть");
+        row1.add("Лосиный сфинктер");
+        rows.add(row1);
+
+        // Клавиатура для выбора темы
+        KeyboardRow row2 = new KeyboardRow();
+        row2.add("Технологии");
+        row2.add("Животные");
+        row2.add("Еда");
+        rows.add(row2);
+
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-        keyboardMarkup.setResizeKeyboard(true);
+        keyboardMarkup.setKeyboard(rows);
+        keyboardMarkup.setOneTimeKeyboard(true);  // Появляется только один раз
+        return keyboardMarkup;
+    }
+
+    public static ReplyKeyboardMarkup createTeamSelectionKeyboard() {
+        List<KeyboardRow> rows = new ArrayList<>();
+        KeyboardRow row1 = new KeyboardRow();
+        row1.add("Ежиная перхоть");
+        row1.add("Лосиный сфинктер");
+        rows.add(row1);
+
+        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+        keyboardMarkup.setKeyboard(rows);
         keyboardMarkup.setOneTimeKeyboard(true);
-
-        List<KeyboardRow> rows = new ArrayList<>();
-        KeyboardRow row = new KeyboardRow();
-        row.add(new KeyboardButton("Технологии"));
-        row.add(new KeyboardButton("Животные"));
-        row.add(new KeyboardButton("Еда"));
-        rows.add(row);
-
-        keyboardMarkup.setKeyboard(rows);
         return keyboardMarkup;
     }
 
-    // Пример клавиатуры для новой игры
-    public static ReplyKeyboardMarkup createGameKeyboard() {
-        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-        keyboardMarkup.setResizeKeyboard(true);
-
+    public static ReplyKeyboardMarkup createThemeSelectionKeyboard() {
         List<KeyboardRow> rows = new ArrayList<>();
-        KeyboardRow row = new KeyboardRow();
-        row.add(new KeyboardButton("Следующее"));
-        row.add(new KeyboardButton("Пропустить"));
-        row.add(new KeyboardButton("Начать новую игру"));
-        rows.add(row);
+        KeyboardRow row1 = new KeyboardRow();
+        row1.add("Технологии");
+        row1.add("Животные");
+        row1.add("Еда");
+        rows.add(row1);
 
+        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         keyboardMarkup.setKeyboard(rows);
+        keyboardMarkup.setOneTimeKeyboard(true);
         return keyboardMarkup;
     }
 
-    // Пример клавиатуры с одной кнопкой для начала новой игры
-    public static ReplyKeyboardMarkup createNewGameKeyboard() {
-        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-        keyboardMarkup.setResizeKeyboard(true);
-
+    public static ReplyKeyboardMarkup createStartGameKeyboard() {
         List<KeyboardRow> rows = new ArrayList<>();
-        KeyboardRow row = new KeyboardRow();
-        row.add(new KeyboardButton("Начать новую игру"));
-        rows.add(row);
+        KeyboardRow row1 = new KeyboardRow();
+        row1.add("Начать игру");
+        rows.add(row1);
 
+        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         keyboardMarkup.setKeyboard(rows);
+        keyboardMarkup.setOneTimeKeyboard(true);
         return keyboardMarkup;
     }
 
-    // Пример клавиатуры для старта
-    public static ReplyKeyboardMarkup createStartKeyboard() {
-        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-        keyboardMarkup.setResizeKeyboard(true);
-
+    public static ReplyKeyboardMarkup createNextWordKeyboard() {
         List<KeyboardRow> rows = new ArrayList<>();
-        KeyboardRow row = new KeyboardRow();
-        row.add(new KeyboardButton("Начать игру"));
-        rows.add(row);
+        KeyboardRow row1 = new KeyboardRow();
+        row1.add("Следующее");
+        row1.add("Пропустить");
+        rows.add(row1);
 
+        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         keyboardMarkup.setKeyboard(rows);
         return keyboardMarkup;
     }

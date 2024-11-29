@@ -14,107 +14,76 @@ public class TelegramCommandHandler {
     }
 
     public void handleCommand(String command, String chatId) {
-        // Получаем состояние игры для текущего чата
         GameState gameState = gameService.getGameState(Long.parseLong(chatId));
 
-        // Если игры нет, начинаем новую
         if (gameState == null) {
             gameService.startNewGame(Long.parseLong(chatId));
         }
 
-        // Инициализация сообщения и клавиатуры
         String responseMessage = "";
-        ReplyKeyboardMarkup replyMarkup = null;  // Используем объект ReplyKeyboardMarkup
+        ReplyKeyboardMarkup replyMarkup = null;
 
-        // Обработка команд
         switch (command.toLowerCase()) {
             case "/start":
-                // Запуск новой игры и выбор темы
                 gameService.startNewGame(Long.parseLong(chatId));
-                responseMessage = "Привет! Давай играть в Аллиас! Выбери тему для игры.";
-                replyMarkup = KeyboardHelper.createThemeSelectionKeyboard(); // Клавиатура для выбора темы
+                responseMessage = "Привет! Выберите команду и тему игры:\n";
+                replyMarkup = KeyboardHelper.createTeamAndThemeSelectionKeyboard();
                 break;
 
-            case "/help":
-                responseMessage = "Бог поможет! Используй команды:\n" +
-                        "/start - начать новую игру\n" +
-                        "/rules - показать правила игры\n" +
-                        "технологии, животные, еда - выбрать тему для игры\n" +
-                        "начать игру - начать игру с выбранной темой\n" +
-                        "следующее - переход к следующему слову\n" +
-                        "пропустить - пропустить слово";
-                break;
-
-            case "/rules":
-                responseMessage = "Правила игры в Аллиас:\n\n" +
-                        "1. Игра состоит из нескольких раундов.\n" +
-                        "2. Игроки по очереди отгадывают слово.\n" +
-                        "3. За каждое правильное отгаданное слово начисляются очки.";
-                replyMarkup = KeyboardHelper.createStartKeyboard(); // Клавиатура для старта игры
-                break;
-
-            case "начать игру":
-                // Начинаем игру с выбранной темой
-                String word = gameService.startGame(Long.parseLong(chatId));
-                responseMessage = "Начинаем игру! \n" + word;
-                replyMarkup = KeyboardHelper.createGameKeyboard(); // Клавиатура для игрового процесса
-                break;
-
-            case "следующее":
-                // Переход к следующему слову
-                String nextWord = gameService.nextWord(Long.parseLong(chatId), true);  // true, если слово угадано
-                responseMessage = nextWord;
-
-                if (gameState.isGameOver()) {
-                    responseMessage = "Игра завершена! Ваши очки: " + gameState.getScore();
-                    replyMarkup = KeyboardHelper.createNewGameKeyboard(); // Кнопка для новой игры
+            case "ежиная перхоть":
+            case "лосиный сфинктер":
+                // Если команда еще не выбрана
+                if (gameState.getTeam1Name() == null) {
+                    // Сначала выбираем команду
+                    gameState.selectTeam(command, "Лосиный сфинктер".equals(command) ? "Ежиная перхоть" : "Лосиный сфинктер");
+                    responseMessage = "Вы выбрали команду '" + command + "'. Теперь выберите тему игры!";
+                    replyMarkup = KeyboardHelper.createThemeSelectionKeyboard();
                 } else {
-                    replyMarkup = KeyboardHelper.createGameKeyboard();  // Продолжаем игру
+                    responseMessage = "Команды уже выбраны!";
+                    replyMarkup = KeyboardHelper.createStartGameKeyboard();
                 }
-                break;
-
-            case "пропустить":
-                String skippedWord = gameService.skipWord(Long.parseLong(chatId));
-                responseMessage = skippedWord;
-
-                if (gameState.isGameOver()) {
-                    responseMessage = "Игра завершена! Ваши очки: " + gameState.getScore();
-                    replyMarkup = KeyboardHelper.createNewGameKeyboard();  // Кнопка для новой игры
-                } else {
-                    replyMarkup = KeyboardHelper.createGameKeyboard();  // Продолжаем игру
-                }
-                break;
-
-            case "начать новую игру":
-                gameService.endGame(Long.parseLong(chatId));
-                gameService.startNewGame(Long.parseLong(chatId));
-                responseMessage = "Новая игра началась! Выберите тему для игры.";
-                replyMarkup = KeyboardHelper.createThemeSelectionKeyboard(); // Клавиатура для выбора темы
                 break;
 
             case "технологии":
-                gameService.selectTheme(Long.parseLong(chatId), "Технологии");
-                responseMessage = "Вы выбрали тему 'Технологии'. Игра начнется с соответствующих слов!";
-                replyMarkup = KeyboardHelper.createStartKeyboard();  // Клавиатура для старта игры
-                break;
-
             case "животные":
-                gameService.selectTheme(Long.parseLong(chatId), "Животные");
-                responseMessage = "Вы выбрали тему 'Животные'. Игра начнется с соответствующих слов!";
-                replyMarkup = KeyboardHelper.createStartKeyboard();  // Клавиатура для старта игры
+            case "еда":
+                // Если команда уже выбрана, выбираем тему
+                if (gameState.getTeam1Name() != null) {
+                    gameState.selectTheme(command);
+                    responseMessage = "Вы выбрали тему '" + command + "'. Начнем игру!";
+                    replyMarkup = KeyboardHelper.createStartGameKeyboard();
+                } else {
+                    responseMessage = "Сначала выберите команду!";
+                    replyMarkup = KeyboardHelper.createTeamSelectionKeyboard();
+                }
                 break;
 
-            case "еда":
-                gameService.selectTheme(Long.parseLong(chatId), "Еда");
-                responseMessage = "Вы выбрали тему 'Еда'. Игра начнется с соответствующих слов!";
-                replyMarkup = KeyboardHelper.createStartKeyboard();  // Клавиатура для старта игры
+            case "начать игру":
+                if (gameState.getTeam1Name() != null && gameState.getCurrentTheme() != null) {
+                    gameState.startGame();
+                    responseMessage = "Игра началась! Время пошло!";
+                    replyMarkup = KeyboardHelper.createNextWordKeyboard();
+                } else {
+                    responseMessage = "Для начала игры необходимо выбрать команду и тему!";
+                    replyMarkup = KeyboardHelper.createTeamAndThemeSelectionKeyboard();
+                }
+                break;
+
+            case "следующее":
+                String nextWord = gameState.nextWord(true);
+                responseMessage = nextWord;
+                break;
+
+            case "пропустить":
+                nextWord = gameState.skipWord();
+                responseMessage = nextWord;
                 break;
 
             default:
-                responseMessage = "Неизвестная команда! Используйте /start для начала.";
+                responseMessage = "Неизвестная команда!";
+                break;
         }
 
-        // Отправляем сообщение с клавиатурой
         messageSender.sendMessage(chatId, responseMessage, replyMarkup);
     }
 }

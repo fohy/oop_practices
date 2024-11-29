@@ -2,6 +2,7 @@ package org.example.bot;
 
 import org.example.service.AliasGameService;
 import org.example.service.GameState;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
 public class TelegramCommandHandler {
     private final AliasGameService gameService;
@@ -23,7 +24,7 @@ public class TelegramCommandHandler {
 
         // Инициализация сообщения и клавиатуры
         String responseMessage = "";
-        String replyMarkupJson = null;
+        ReplyKeyboardMarkup replyMarkup = null;  // Используем объект ReplyKeyboardMarkup
 
         // Обработка команд
         switch (command.toLowerCase()) {
@@ -31,7 +32,7 @@ public class TelegramCommandHandler {
                 // Запуск новой игры и выбор темы
                 gameService.startNewGame(Long.parseLong(chatId));
                 responseMessage = "Привет! Давай играть в Аллиас! Выбери тему для игры.";
-                replyMarkupJson = KeyboardHelper.createThemeSelectionKeyboardJson(); // Клавиатура для выбора темы
+                replyMarkup = KeyboardHelper.createThemeSelectionKeyboard(); // Клавиатура для выбора темы
                 break;
 
             case "/help":
@@ -49,13 +50,14 @@ public class TelegramCommandHandler {
                         "1. Игра состоит из нескольких раундов.\n" +
                         "2. Игроки по очереди отгадывают слово.\n" +
                         "3. За каждое правильное отгаданное слово начисляются очки.";
-                replyMarkupJson = KeyboardHelper.createStartKeyboardJson(); // Клавиатура для старта игры
+                replyMarkup = KeyboardHelper.createStartKeyboard(); // Клавиатура для старта игры
                 break;
+
             case "начать игру":
                 // Начинаем игру с выбранной темой
                 String word = gameService.startGame(Long.parseLong(chatId));
                 responseMessage = "Начинаем игру! \n" + word;
-                replyMarkupJson = KeyboardHelper.createGameKeyboardJson(); // Клавиатура для игрового процесса
+                replyMarkup = KeyboardHelper.createGameKeyboard(); // Клавиатура для игрового процесса
                 break;
 
             case "следующее":
@@ -65,9 +67,9 @@ public class TelegramCommandHandler {
 
                 if (gameState.isGameOver()) {
                     responseMessage = "Игра завершена! Ваши очки: " + gameState.getScore();
-                    replyMarkupJson = KeyboardHelper.createNewGameKeyboardJson(); // Кнопка для новой игры
+                    replyMarkup = KeyboardHelper.createNewGameKeyboard(); // Кнопка для новой игры
                 } else {
-                    replyMarkupJson = KeyboardHelper.createGameKeyboardJson();  // Продолжаем игру
+                    replyMarkup = KeyboardHelper.createGameKeyboard();  // Продолжаем игру
                 }
                 break;
 
@@ -77,9 +79,9 @@ public class TelegramCommandHandler {
 
                 if (gameState.isGameOver()) {
                     responseMessage = "Игра завершена! Ваши очки: " + gameState.getScore();
-                    replyMarkupJson = KeyboardHelper.createNewGameKeyboardJson();  // Кнопка для новой игры
+                    replyMarkup = KeyboardHelper.createNewGameKeyboard();  // Кнопка для новой игры
                 } else {
-                    replyMarkupJson = KeyboardHelper.createGameKeyboardJson();  // Продолжаем игру
+                    replyMarkup = KeyboardHelper.createGameKeyboard();  // Продолжаем игру
                 }
                 break;
 
@@ -87,32 +89,32 @@ public class TelegramCommandHandler {
                 gameService.endGame(Long.parseLong(chatId));
                 gameService.startNewGame(Long.parseLong(chatId));
                 responseMessage = "Новая игра началась! Выберите тему для игры.";
-                replyMarkupJson = KeyboardHelper.createThemeSelectionKeyboardJson(); // Клавиатура для выбора темы
+                replyMarkup = KeyboardHelper.createThemeSelectionKeyboard(); // Клавиатура для выбора темы
                 break;
 
             case "технологии":
                 gameService.selectTheme(Long.parseLong(chatId), "Технологии");
                 responseMessage = "Вы выбрали тему 'Технологии'. Игра начнется с соответствующих слов!";
-                replyMarkupJson = KeyboardHelper.createStartKeyboardJson();  // Клавиатура для старта игры
+                replyMarkup = KeyboardHelper.createStartKeyboard();  // Клавиатура для старта игры
                 break;
 
             case "животные":
                 gameService.selectTheme(Long.parseLong(chatId), "Животные");
                 responseMessage = "Вы выбрали тему 'Животные'. Игра начнется с соответствующих слов!";
-                replyMarkupJson = KeyboardHelper.createStartKeyboardJson();  // Клавиатура для старта игры
+                replyMarkup = KeyboardHelper.createStartKeyboard();  // Клавиатура для старта игры
                 break;
 
             case "еда":
                 gameService.selectTheme(Long.parseLong(chatId), "Еда");
                 responseMessage = "Вы выбрали тему 'Еда'. Игра начнется с соответствующих слов!";
-                replyMarkupJson = KeyboardHelper.createStartKeyboardJson();  // Клавиатура для старта игры
+                replyMarkup = KeyboardHelper.createStartKeyboard();  // Клавиатура для старта игры
                 break;
 
             default:
-                responseMessage = "Неизвестная команда. Используйте /help для получения справки.";
-                break;
+                responseMessage = "Неизвестная команда! Используйте /start для начала.";
         }
 
-        messageSender.sendMessage(chatId, responseMessage, replyMarkupJson);
+        // Отправляем сообщение с клавиатурой
+        messageSender.sendMessage(chatId, responseMessage, replyMarkup);
     }
 }

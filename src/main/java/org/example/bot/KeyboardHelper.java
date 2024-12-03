@@ -79,4 +79,37 @@ public class KeyboardHelper {
         keyboardMarkup.setKeyboard(rows);
         return keyboardMarkup;
     }
+
+    public static ReplyKeyboardMarkup createLobbyMenuKeyboard() {
+        List<KeyboardRow> rows = new ArrayList<>();
+        KeyboardRow row1 = new KeyboardRow();
+        row1.add("Создать лобби");
+        row1.add("Войти в лобби по коду");
+        rows.add(row1);
+
+        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+        keyboardMarkup.setKeyboard(rows);
+        keyboardMarkup.setOneTimeKeyboard(true); // Клавиатура исчезает после выбора
+        return keyboardMarkup;
+    }
+
+    public static ReplyKeyboardMarkup createLobbyWithEarlyStartKeyboard(int lobbyId) {
+        List<KeyboardRow> rows = new ArrayList<>();
+
+        // Кнопка "Начать игру досрочно"
+        KeyboardRow row1 = new KeyboardRow();
+        row1.add("Начать игру досрочно");
+        rows.add(row1);
+
+        // Можно добавить другие кнопки, например, для выхода из лобби
+        KeyboardRow row2 = new KeyboardRow();
+        row2.add("Выйти из лобби");
+        rows.add(row2);
+
+        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+        keyboardMarkup.setKeyboard(rows);
+        keyboardMarkup.setOneTimeKeyboard(true);  // Клавиатура появляется один раз
+
+        return keyboardMarkup;
+    }
 }

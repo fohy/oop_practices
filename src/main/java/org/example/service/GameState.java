@@ -6,8 +6,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Arrays;
 
 public class GameState {
+    private List<String> players = new ArrayList<>();
     private List<String> words;             // Список слов для игры
     private int team1Score;                  // Очки для команды 1
     private int team2Score;                  // Очки для команды 2
@@ -110,6 +112,18 @@ public class GameState {
         return word;
     }
 
+    public List<String> getWords() {
+        return words;
+    }
+
+    // Метод для перезапуска игры
+    public void restartGame() {
+        // Перезапускаем список слов и сбрасываем игровые параметры
+        this.words = new ArrayList<>(Arrays.asList("apple", "banana", "cherry", "date"));  // Пример
+        this.round = 0;  // Сбросить раунд
+        this.gameOver = false;  // Игра не закончена
+    }
+
     // Метод для пропуска слова
     public String skipWord() {
         if (words.isEmpty()) {
@@ -129,6 +143,7 @@ public class GameState {
         }
         return null;
     }
+
 
     // Метод для проверки, завершена ли игра
     public boolean isGameOver() {
@@ -193,4 +208,9 @@ public class GameState {
     public String getGameInfo() {
         return String.format("Тема: %s, Раунд: %d, Команда 1: %s, Команда 2: %s", currentTheme, round, team1Name, team2Name);
     }
+
+    public List<String> getPlayers() {
+        return players;
+    }
+
 }

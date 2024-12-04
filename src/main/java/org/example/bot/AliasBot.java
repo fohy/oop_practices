@@ -14,7 +14,7 @@ public class AliasBot extends TelegramLongPollingBot {
     }
     @Override
     public String getBotToken() {
-        return "7756968278:AAFYiGjm-zTzluV2v_uHRLnzvWDI6EG_dh8";
+        return "7756968278:AAG76WowoPUeqdBAbHZSBt_K-I4wHmYYUiA";
     }
     @Override
     public void onUpdateReceived(Update update) {

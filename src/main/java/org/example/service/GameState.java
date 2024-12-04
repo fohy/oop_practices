@@ -6,20 +6,23 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Arrays;
 
 public class GameState {
-    private List<String> words;             // Список слов для игры
-    private int team1Score;                  // Очки для команды 1
-    private int team2Score;                  // Очки для команды 2
-    private boolean gameOver;                // Статус завершения игры
-    private String currentTheme;             // Текущая тема игры
-    private long startTime;                  // Время начала игры
-    private int round;                       // Текущий раунд
-    private String team1Name;                // Имя команды 1
-    private String team2Name;                // Имя команды 2
-    private String currentTeam;              // Текущая команда (для поочередных ходов)
+    private int currentRound = 1;
+    private List<String> players = new ArrayList<>();
+    private List<String> words; // Список слов для игры
+    private int team1Score; // Очки для команды 1
+    private int team2Score; // Очки для команды 2
+    private boolean gameOver; // Статус завершения игры
+    private String currentTheme; // Текущая тема игры
+    private long roundStartTime; // Время начала раунда
+    private int round; // Текущий раунд
+    private String team1Name; // Имя команды 1
+    private String team2Name; // Имя команды 2
+    private String currentTeam; // Текущая команда (для поочередных ходов)
     private static final int MAX_ROUNDS = 6; // Максимальное количество раундов
-    private static final long TIME_LIMIT = 60000; // Время для угадывания (1 минута)
+    private static final long ROUND_TIME_LIMIT = 30000; // Время для раунда (30 секунд)
 
     public GameState() {
         this.words = new ArrayList<>();
@@ -30,7 +33,6 @@ public class GameState {
         this.currentTeam = "Team 1"; // Начинает команда 1
         this.currentTheme = null;
         initializeWords();
-        this.startTime = System.currentTimeMillis();
     }
 
     // Метод для выбора команды
@@ -110,6 +112,18 @@ public class GameState {
         return word;
     }
 
+    public List<String> getWords() {
+        return words;
+    }
+
+    // Метод для перезапуска игры
+    public void restartGame() {
+        // Перезапускаем список слов и сбрасываем игровые параметры
+        this.words = new ArrayList<>(Arrays.asList("apple", "banana", "cherry", "date"));  // Пример
+        this.round = 0;  // Сбросить раунд
+        this.gameOver = false;  // Игра не закончена
+    }
+
     // Метод для пропуска слова
     public String skipWord() {
         if (words.isEmpty()) {
@@ -123,7 +137,7 @@ public class GameState {
     // Метод для начала игры
     public String startGame() {
         if (currentTheme != null && team1Name != null && team2Name != null) {
-            this.startTime = System.currentTimeMillis();
+            this.roundStartTime = System.currentTimeMillis();
             this.round = 1;
             this.gameOver = false;
         }
@@ -159,9 +173,9 @@ public class GameState {
         this.gameOver = true;
     }
 
-    // Метод для получения времени, прошедшего с начала игры
+    // Метод для получения времени, прошедшего с начала раунда
     public long getElapsedTime() {
-        return System.currentTimeMillis() - startTime;
+        return System.currentTimeMillis() - roundStartTime;
     }
 
     // Получение имени команды 1
@@ -192,5 +206,29 @@ public class GameState {
     // Метод для возвращения информации об игре
     public String getGameInfo() {
         return String.format("Тема: %s, Раунд: %d, Команда 1: %s, Команда 2: %s", currentTheme, round, team1Name, team2Name);
+    }
+
+    public List<String> getPlayers() {
+        return players;
+    }
+    public void nextRound() {
+        currentRound++;  // Увеличиваем номер раунда
+        // Логика для переключения команд
+        switchTeam();  // Например, вызываем метод, который переключает команду
+    }
+    // Метод для отслеживания времени в раунде
+    public String trackTime() {
+        long elapsedTime = System.currentTimeMillis() - roundStartTime;
+        long remainingTime = ROUND_TIME_LIMIT - elapsedTime;
+
+        if (remainingTime <= 0) {
+            // Время вышло, завершаем раунд
+            switchTeam();
+            roundStartTime = System.currentTimeMillis(); // Начало следующего раунда
+            return "Время истекло! Следующий раунд.";
+        }
+
+        long secondsLeft = remainingTime / 1000;
+        return "Осталось времени: " + secondsLeft + " секунд";
     }
 }

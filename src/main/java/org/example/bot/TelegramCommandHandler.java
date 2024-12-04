@@ -1,27 +1,35 @@
 package org.example.bot;
+
 import org.example.service.AliasGameService;
 import org.example.service.GameState;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+
 public class TelegramCommandHandler {
     private final AliasGameService gameService;
     private final IMessageSender messageSender;
+
     public TelegramCommandHandler(AliasGameService gameService, IMessageSender messageSender) {
         this.gameService = gameService;
         this.messageSender = messageSender;
     }
+
     public void handleCommand(String command, String chatId) {
         GameState gameState = gameService.getGameState(Long.parseLong(chatId));
+
         if (gameState == null) {
             gameService.startNewGame(Long.parseLong(chatId));
         }
+
         String responseMessage = "";
         ReplyKeyboardMarkup replyMarkup = null;
+
         switch (command.toLowerCase()) {
             case "/start":
                 gameService.startNewGame(Long.parseLong(chatId));
                 responseMessage = "Привет! Выберите команду и тему игры:\n";
                 replyMarkup = KeyboardHelper.createTeamSelectionKeyboard();
                 break;
+
             case "ежиная перхоть":
             case "лосиный сфинктер":
                 // Если команда еще не выбрана
@@ -35,6 +43,7 @@ public class TelegramCommandHandler {
                     replyMarkup = KeyboardHelper.createStartGameKeyboard();
                 }
                 break;
+
             case "технологии":
             case "животные":
             case "еда":
@@ -48,6 +57,7 @@ public class TelegramCommandHandler {
                     replyMarkup = KeyboardHelper.createTeamSelectionKeyboard();
                 }
                 break;
+
             case "начать игру":
                 if (gameState.getTeam1Name() != null && gameState.getCurrentTheme() != null) {
                     gameState.startGame();
@@ -58,18 +68,22 @@ public class TelegramCommandHandler {
                     replyMarkup = KeyboardHelper.createTeamAndThemeSelectionKeyboard();
                 }
                 break;
+
             case "следующее":
                 String nextWord = gameState.nextWord(true);
                 responseMessage = nextWord;
                 break;
+
             case "пропустить":
                 nextWord = gameState.skipWord();
                 responseMessage = nextWord;
                 break;
+
             default:
                 responseMessage = "Неизвестная команда!";
                 break;
         }
+
         messageSender.sendMessage(chatId, responseMessage, replyMarkup);
     }
 }

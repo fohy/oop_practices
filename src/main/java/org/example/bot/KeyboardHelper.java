@@ -10,13 +10,11 @@ public class KeyboardHelper {
     public static ReplyKeyboardMarkup createTeamAndThemeSelectionKeyboard() {
         List<KeyboardRow> rows = new ArrayList<>();
 
-        // Клавиатура для выбора команды
         KeyboardRow row1 = new KeyboardRow();
         row1.add("Ежиная перхоть");
         row1.add("Лосиный сфинктер");
         rows.add(row1);
 
-        // Клавиатура для выбора темы
         KeyboardRow row2 = new KeyboardRow();
         row2.add("Технологии");
         row2.add("Животные");
@@ -25,7 +23,7 @@ public class KeyboardHelper {
 
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         keyboardMarkup.setKeyboard(rows);
-        keyboardMarkup.setOneTimeKeyboard(true);  // Появляется только один раз
+        keyboardMarkup.setOneTimeKeyboard(true);
         return keyboardMarkup;
     }
 
@@ -89,26 +87,24 @@ public class KeyboardHelper {
 
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         keyboardMarkup.setKeyboard(rows);
-        keyboardMarkup.setOneTimeKeyboard(true); // Клавиатура исчезает после выбора
+        keyboardMarkup.setOneTimeKeyboard(true);
         return keyboardMarkup;
     }
 
     public static ReplyKeyboardMarkup createLobbyWithEarlyStartKeyboard(int lobbyId) {
         List<KeyboardRow> rows = new ArrayList<>();
 
-        // Кнопка "Начать игру досрочно"
         KeyboardRow row1 = new KeyboardRow();
         row1.add("Начать игру досрочно");
         rows.add(row1);
 
-        // Можно добавить другие кнопки, например, для выхода из лобби
         KeyboardRow row2 = new KeyboardRow();
         row2.add("Выйти из лобби");
         rows.add(row2);
 
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         keyboardMarkup.setKeyboard(rows);
-        keyboardMarkup.setOneTimeKeyboard(true);  // Клавиатура появляется один раз
+        keyboardMarkup.setOneTimeKeyboard(true);
 
         return keyboardMarkup;
     }

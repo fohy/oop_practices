@@ -32,7 +32,7 @@ public class TelegramCommandHandler {
 
     private void handleLobbyCode(String chatId, String lobbyCode) {
         try {
-            int lobbyId = Integer.parseInt(lobbyCode.trim());  // Преобразуем код лобби в число
+            int lobbyId = Integer.parseInt(lobbyCode.trim());
             Long chatIdLong = Long.parseLong(chatId);
 
             if (gameService.joinLobby(lobbyId, chatIdLong)) {
@@ -52,26 +52,26 @@ public class TelegramCommandHandler {
     }
 
     private void startRoundTimer(String chatId, GameState gameState) {
-        // Запускаем новый поток для отсчета времени
+
         new Thread(() -> {
             long startTime = System.currentTimeMillis();
-            long timeLimit = 30000; // 30 секунд на каждый раунд
+            long timeLimit = 30000;
             while (System.currentTimeMillis() - startTime < timeLimit) {
-                // Периодически проверяем, сколько времени осталось
+
                 long remainingTime = timeLimit - (System.currentTimeMillis() - startTime);
                 String timeMessage = "Осталось " + remainingTime / 1000 + " секунд.";
                 messageSender.sendMessage(chatId, timeMessage, null);
 
                 try {
-                    Thread.sleep(1000);  // Пауза в 1 секунду
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            // Когда время истекает, мы переходим к следующей команде и увеличиваем раунд
-            gameState.nextRound();  // Переход к следующему раунду
+
+            gameState.nextRound();
             messageSender.sendMessage(chatId, "Раунд завершен! Переходите к следующей команде.", null);
-            // Обновляем состояние игры, даем возможность второй команде выбрать тему
+
             if ("Team 1".equals(gameState.getCurrentTeam())) {
                 messageSender.sendMessage(chatId, "Теперь ваша очередь выбрать тему.", KeyboardHelper.createThemeSelectionKeyboard());
             } else {
@@ -137,12 +137,10 @@ public class TelegramCommandHandler {
             case "животные":
             case "еда":
                 if (gameState.getTeam1Name() != null && gameState.getCurrentTheme() == null) {
-                    // Выбор темы для первой команды
                     gameState.selectTheme(command);
                     responseMessage = "Вы выбрали тему '" + command + "'. Теперь игра начнется!";
                     replyMarkup = KeyboardHelper.createStartGameKeyboard();
                 } else if (gameState.getTeam2Name() != null && gameState.getCurrentTheme() != null) {
-                    // Выбор темы для второй команды
                     gameState.selectTheme(command);
                     responseMessage = "Вы выбрали тему '" + command + "'. Игра начнется!";
                     replyMarkup = KeyboardHelper.createStartGameKeyboard();
@@ -157,7 +155,7 @@ public class TelegramCommandHandler {
                     gameState.startGame();
                     responseMessage = "Игра началась! Время пошло!";
                     replyMarkup = KeyboardHelper.createNextWordKeyboard();
-                    startRoundTimer(chatId, gameState); // Запускаем таймер
+                    startRoundTimer(chatId, gameState);
                 } else {
                     responseMessage = "Для начала игры необходимо выбрать команду и тему!";
                     replyMarkup = KeyboardHelper.createTeamAndThemeSelectionKeyboard();

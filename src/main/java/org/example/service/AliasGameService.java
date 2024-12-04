@@ -25,31 +25,31 @@ public class AliasGameService {
         gameStates.put(chatId, new GameState());
     }
 
-    // Создание нового лобби
+
     public int createLobby(Long creatorChatId) {
-        int newLobbyId = lobbyIdCounter.getAndIncrement(); // Генерируем новый уникальный идентификатор лобби
-        Lobby newLobby = new Lobby(newLobbyId, creatorChatId); // Создаем новое лобби
-        lobbies.put(newLobbyId, newLobby); // Добавляем его в коллекцию лобби
-        return newLobbyId; // Возвращаем номер созданного лобби
+        int newLobbyId = lobbyIdCounter.getAndIncrement();
+        Lobby newLobby = new Lobby(newLobbyId, creatorChatId);
+        lobbies.put(newLobbyId, newLobby);
+        return newLobbyId;
     }
 
     public int getLobbyIdByChatId(Long chatId) {
         for (Map.Entry<Integer, Lobby> entry : lobbies.entrySet()) {
             if (entry.getValue().getParticipants().contains(chatId)) {
-                return entry.getKey(); // Возвращаем lobbyId
+                return entry.getKey();
             }
         }
-        return -1; // Если лобби не найдено для chatId
+        return -1;
     }
 
     public boolean startGameEarly(int lobbyId) {
-        Lobby lobby = lobbies.get(lobbyId);  // Получаем лобби по ID
+        Lobby lobby = lobbies.get(lobbyId);
         if (lobby == null) {
-            return false;  // Лобби не найдено
+            return false;
         }
 
-        List<Long> participants = new ArrayList<>(lobby.getParticipants());  // Получаем участников лобби
-        if (participants.size() < 1) {  // Убедитесь, что в лобби есть хотя бы один участник
+        List<Long> participants = new ArrayList<>(lobby.getParticipants());
+        if (participants.size() < 1) {
             return false;
         }
 
@@ -60,40 +60,40 @@ public class AliasGameService {
                 gameStates.put(chatId, gameState);
             }
 
-            // Перезапускаем игру (инициализация слов при старте игры досрочно)
+
             if (gameState.getWords().isEmpty()) {
-                gameState.restartGame();  // Загружаем новые слова для игры
+                gameState.restartGame();
             }
 
-            // Инициализируем игру для каждого участника
-            gameState.startGame();  // Запуск игры
+
+            gameState.startGame();
         }
 
-        return true;  // Игра успешно началась
+        return true;
     }
 
 
-    // Присоединение к лобби
+
     public boolean joinLobby(int lobbyId, Long participantChatId) {
-        Lobby lobby = lobbies.get(lobbyId); // Получаем лобби по ID
+        Lobby lobby = lobbies.get(lobbyId);
         if (lobby != null) {
-            return lobby.addParticipant(participantChatId); // Добавляем участника в лобби
+            return lobby.addParticipant(participantChatId);
         }
-        return false; // Лобби с таким ID не найдено
+        return false;
     }
 
     public List<Long> getLobbyPlayers(int lobbyId) {
-        Lobby lobby = lobbies.get(lobbyId); // Извлекаем лобби
+        Lobby lobby = lobbies.get(lobbyId);
         if (lobby != null) {
-            return new ArrayList<>(lobby.getParticipants()); // Возвращаем список участников
+            return new ArrayList<>(lobby.getParticipants());
         }
-        return new ArrayList<>(); // Если лобби не найдено, возвращаем пустой список
+        return new ArrayList<>();
     }
 
     private void addToLobby(int lobbyId, Long chatId) {
         Lobby lobby = lobbies.get(lobbyId);
         if (lobby != null) {
-            lobby.addParticipant(chatId); // Используем метод `addParticipant` из класса `Lobby`
+            lobby.addParticipant(chatId);
         } else {
             throw new IllegalArgumentException("Лобби с ID " + lobbyId + " не существует.");
         }

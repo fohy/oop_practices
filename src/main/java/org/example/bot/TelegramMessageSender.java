@@ -17,13 +17,13 @@ public class TelegramMessageSender implements IMessageSender {
         sendMessage.setChatId(chatId);
         sendMessage.setText(message);
 
-        // Если replyMarkup не null, устанавливаем его в сообщение
+
         if (replyMarkup != null) {
             sendMessage.setReplyMarkup(replyMarkup);
         }
 
         try {
-            // Отправляем сообщение
+
             bot.execute(sendMessage);
         } catch (Exception e) {
             e.printStackTrace();

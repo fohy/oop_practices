@@ -11,18 +11,18 @@ import java.util.Arrays;
 public class GameState {
     private int currentRound = 1;
     private List<String> players = new ArrayList<>();
-    private List<String> words; // Список слов для игры
-    private int team1Score; // Очки для команды 1
-    private int team2Score; // Очки для команды 2
-    private boolean gameOver; // Статус завершения игры
-    private String currentTheme; // Текущая тема игры
-    private long roundStartTime; // Время начала раунда
-    private int round; // Текущий раунд
-    private String team1Name; // Имя команды 1
-    private String team2Name; // Имя команды 2
-    private String currentTeam; // Текущая команда (для поочередных ходов)
-    private static final int MAX_ROUNDS = 6; // Максимальное количество раундов
-    private static final long ROUND_TIME_LIMIT = 30000; // Время для раунда (30 секунд)
+    private List<String> words;
+    private int team1Score;
+    private int team2Score;
+    private boolean gameOver;
+    private String currentTheme;
+    private long roundStartTime;
+    private int round;
+    private String team1Name;
+    private String team2Name;
+    private String currentTeam;
+    private static final int MAX_ROUNDS = 6;
+    private static final long ROUND_TIME_LIMIT = 30000;
 
     public GameState() {
         this.words = new ArrayList<>();
@@ -30,30 +30,27 @@ public class GameState {
         this.team2Score = 0;
         this.gameOver = false;
         this.round = 1;
-        this.currentTeam = "Team 1"; // Начинает команда 1
+        this.currentTeam = "Team 1";
         this.currentTheme = null;
         initializeWords();
     }
 
-    // Метод для выбора команды
     public void selectTeam(String team1Name, String team2Name) {
         this.team1Name = team1Name;
         this.team2Name = team2Name;
     }
 
-    // Метод для выбора темы
     public void selectTheme(String theme) {
         this.currentTheme = theme;
-        initializeWords();  // Загружаем слова для выбранной темы
+        initializeWords();
     }
 
-    // Метод для инициализации списка слов в зависимости от выбранной темы
     public void initializeWords() {
         words.clear();
 
         try {
             if (currentTheme == null) {
-                return; // Если тема не выбрана, не инициализируем слова
+                return;
             }
 
             switch (currentTheme) {
@@ -69,14 +66,13 @@ public class GameState {
                 default:
                     throw new IllegalArgumentException("Неизвестная тема: " + currentTheme);
             }
-            Collections.shuffle(words);  // Перемешиваем слова
+            Collections.shuffle(words);
         } catch (IOException e) {
             e.printStackTrace();
             words.add("Ошибка при загрузке слов.");
         }
     }
 
-    // Загружает слова из файла
     private List<String> loadWordsFromFile(String filePath) throws IOException {
         List<String> loadedWords = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
@@ -88,24 +84,21 @@ public class GameState {
         return loadedWords;
     }
 
-    // Метод для получения текущей команды
     public String getCurrentTeam() {
         return currentTeam;
     }
 
-    // Метод для переключения команды (после каждого хода)
     public void switchTeam() {
         currentTeam = currentTeam.equals("Team 1") ? "Team 2" : "Team 1";
     }
 
-    // Метод для получения текущего слова для угадывания
     public String nextWord(boolean isStartOfRound) {
         if (words.isEmpty()) {
             return "Слова закончились!";
         }
 
         if (isStartOfRound) {
-            round++;  // Переход к следующему раунду
+            round++;
         }
 
         String word = words.remove(0);
@@ -116,25 +109,21 @@ public class GameState {
         return words;
     }
 
-    // Метод для перезапуска игры
     public void restartGame() {
-        // Перезапускаем список слов и сбрасываем игровые параметры
-        this.words = new ArrayList<>(Arrays.asList("apple", "banana", "cherry", "date"));  // Пример
-        this.round = 0;  // Сбросить раунд
-        this.gameOver = false;  // Игра не закончена
+        this.words = new ArrayList<>(Arrays.asList("apple", "banana", "cherry", "date"));
+        this.round = 0;
+        this.gameOver = false;
     }
 
-    // Метод для пропуска слова
     public String skipWord() {
         if (words.isEmpty()) {
             return "Слова закончились!";
         }
 
-        String word = words.remove(0);  // Пропускаем слово и убираем его из списка
+        String word = words.remove(0);
         return word;
     }
 
-    // Метод для начала игры
     public String startGame() {
         if (currentTheme != null && team1Name != null && team2Name != null) {
             this.roundStartTime = System.currentTimeMillis();
@@ -144,12 +133,10 @@ public class GameState {
         return null;
     }
 
-    // Метод для проверки, завершена ли игра
     public boolean isGameOver() {
         return gameOver;
     }
 
-    // Метод для получения очков команды
     public int getTeamScore(String teamName) {
         if (teamName.equals(team1Name)) {
             return team1Score;
@@ -159,7 +146,6 @@ public class GameState {
         return 0;
     }
 
-    // Метод для обновления очков
     public void updateScore(int score) {
         if (currentTeam.equals("Team 1")) {
             team1Score += score;
@@ -168,42 +154,34 @@ public class GameState {
         }
     }
 
-    // Метод для завершения игры
     public void endGame() {
         this.gameOver = true;
     }
 
-    // Метод для получения времени, прошедшего с начала раунда
     public long getElapsedTime() {
         return System.currentTimeMillis() - roundStartTime;
     }
 
-    // Получение имени команды 1
     public String getTeam1Name() {
         return team1Name;
     }
 
-    // Получение имени команды 2
     public String getTeam2Name() {
         return team2Name;
     }
 
-    // Получение текущей темы
     public String getCurrentTheme() {
         return currentTheme;
     }
 
-    // Получение текущего раунда
     public int getRound() {
         return round;
     }
 
-    // Проверка на наличие завершенной игры
     public boolean isGameFinished() {
         return round > MAX_ROUNDS || gameOver;
     }
 
-    // Метод для возвращения информации об игре
     public String getGameInfo() {
         return String.format("Тема: %s, Раунд: %d, Команда 1: %s, Команда 2: %s", currentTheme, round, team1Name, team2Name);
     }
@@ -212,19 +190,16 @@ public class GameState {
         return players;
     }
     public void nextRound() {
-        currentRound++;  // Увеличиваем номер раунда
-        // Логика для переключения команд
-        switchTeam();  // Например, вызываем метод, который переключает команду
+        currentRound++;
+        switchTeam();
     }
-    // Метод для отслеживания времени в раунде
     public String trackTime() {
         long elapsedTime = System.currentTimeMillis() - roundStartTime;
         long remainingTime = ROUND_TIME_LIMIT - elapsedTime;
 
         if (remainingTime <= 0) {
-            // Время вышло, завершаем раунд
             switchTeam();
-            roundStartTime = System.currentTimeMillis(); // Начало следующего раунда
+            roundStartTime = System.currentTimeMillis();
             return "Время истекло! Следующий раунд.";
         }
 

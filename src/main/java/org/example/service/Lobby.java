@@ -12,7 +12,7 @@ public class Lobby {
     public Lobby(int lobbyId, Long creatorChatId) {
         this.lobbyId = lobbyId;
         this.creatorChatId = creatorChatId;
-        this.participants.add(creatorChatId); // Создатель лобби автоматически становится участником
+        this.participants.add(creatorChatId);
     }
 
     public int getLobbyId() {
@@ -20,14 +20,14 @@ public class Lobby {
     }
 
     public boolean addParticipant(Long chatId) {
-        return participants.add(chatId); // Добавление нового участника
+        return participants.add(chatId);
     }
 
     public boolean isFull() {
-        return participants.size() >= 2; // Логика проверки заполненности (например, 2 участника для старта игры)
+        return participants.size() >= 2;
     }
 
     public Set<Long> getParticipants() {
-        return Collections.unmodifiableSet(participants); // Возвращаем неизменяемый Set участников
+        return Collections.unmodifiableSet(participants);
     }
 }

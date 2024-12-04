@@ -9,19 +9,20 @@ import java.util.List;
 import java.util.Arrays;
 
 public class GameState {
+    private int currentRound = 1;
     private List<String> players = new ArrayList<>();
-    private List<String> words;             // Список слов для игры
-    private int team1Score;                  // Очки для команды 1
-    private int team2Score;                  // Очки для команды 2
-    private boolean gameOver;                // Статус завершения игры
-    private String currentTheme;             // Текущая тема игры
-    private long startTime;                  // Время начала игры
-    private int round;                       // Текущий раунд
-    private String team1Name;                // Имя команды 1
-    private String team2Name;                // Имя команды 2
-    private String currentTeam;              // Текущая команда (для поочередных ходов)
+    private List<String> words; // Список слов для игры
+    private int team1Score; // Очки для команды 1
+    private int team2Score; // Очки для команды 2
+    private boolean gameOver; // Статус завершения игры
+    private String currentTheme; // Текущая тема игры
+    private long roundStartTime; // Время начала раунда
+    private int round; // Текущий раунд
+    private String team1Name; // Имя команды 1
+    private String team2Name; // Имя команды 2
+    private String currentTeam; // Текущая команда (для поочередных ходов)
     private static final int MAX_ROUNDS = 6; // Максимальное количество раундов
-    private static final long TIME_LIMIT = 60000; // Время для угадывания (1 минута)
+    private static final long ROUND_TIME_LIMIT = 30000; // Время для раунда (30 секунд)
 
     public GameState() {
         this.words = new ArrayList<>();
@@ -32,7 +33,6 @@ public class GameState {
         this.currentTeam = "Team 1"; // Начинает команда 1
         this.currentTheme = null;
         initializeWords();
-        this.startTime = System.currentTimeMillis();
     }
 
     // Метод для выбора команды
@@ -137,13 +137,12 @@ public class GameState {
     // Метод для начала игры
     public String startGame() {
         if (currentTheme != null && team1Name != null && team2Name != null) {
-            this.startTime = System.currentTimeMillis();
+            this.roundStartTime = System.currentTimeMillis();
             this.round = 1;
             this.gameOver = false;
         }
         return null;
     }
-
 
     // Метод для проверки, завершена ли игра
     public boolean isGameOver() {
@@ -174,9 +173,9 @@ public class GameState {
         this.gameOver = true;
     }
 
-    // Метод для получения времени, прошедшего с начала игры
+    // Метод для получения времени, прошедшего с начала раунда
     public long getElapsedTime() {
-        return System.currentTimeMillis() - startTime;
+        return System.currentTimeMillis() - roundStartTime;
     }
 
     // Получение имени команды 1
@@ -212,5 +211,24 @@ public class GameState {
     public List<String> getPlayers() {
         return players;
     }
+    public void nextRound() {
+        currentRound++;  // Увеличиваем номер раунда
+        // Логика для переключения команд
+        switchTeam();  // Например, вызываем метод, который переключает команду
+    }
+    // Метод для отслеживания времени в раунде
+    public String trackTime() {
+        long elapsedTime = System.currentTimeMillis() - roundStartTime;
+        long remainingTime = ROUND_TIME_LIMIT - elapsedTime;
 
+        if (remainingTime <= 0) {
+            // Время вышло, завершаем раунд
+            switchTeam();
+            roundStartTime = System.currentTimeMillis(); // Начало следующего раунда
+            return "Время истекло! Следующий раунд.";
+        }
+
+        long secondsLeft = remainingTime / 1000;
+        return "Осталось времени: " + secondsLeft + " секунд";
+    }
 }

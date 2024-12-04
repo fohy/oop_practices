@@ -3,7 +3,6 @@ package org.example.bot;
 import org.example.service.AliasGameService;
 import org.example.service.GameState;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import java.util.List;
 
 public class TelegramCommandHandler {
     private final AliasGameService gameService;
@@ -18,14 +17,12 @@ public class TelegramCommandHandler {
         Long chatIdLong = Long.parseLong(chatId);
         int lobbyId = gameService.createLobby(chatIdLong);
 
-        // Создаем клавиатуру с кнопками "Начать игру досрочно" и другими действиями
         ReplyKeyboardMarkup keyboardMarkup = KeyboardHelper.createLobbyWithEarlyStartKeyboard(lobbyId);
 
         messageSender.sendMessage(chatId,
                 "Лобби создано! Ваш код: " + lobbyId + "\nОжидаем второго игрока...",
                 keyboardMarkup);
     }
-
 
     private void askForLobbyCode(String chatId) {
         messageSender.sendMessage(chatId,
@@ -54,6 +51,35 @@ public class TelegramCommandHandler {
         }
     }
 
+    private void startRoundTimer(String chatId, GameState gameState) {
+        // Запускаем новый поток для отсчета времени
+        new Thread(() -> {
+            long startTime = System.currentTimeMillis();
+            long timeLimit = 10000; // 30 секунд на каждый раунд
+            while (System.currentTimeMillis() - startTime < timeLimit) {
+                // Периодически проверяем, сколько времени осталось
+                long remainingTime = timeLimit - (System.currentTimeMillis() - startTime);
+                String timeMessage = "Осталось " + remainingTime / 1000 + " секунд.";
+                messageSender.sendMessage(chatId, timeMessage, null);
+
+                try {
+                    Thread.sleep(1000);  // Пауза в 1 секунду
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            // Когда время истекает, мы переходим к следующей команде и увеличиваем раунд
+            gameState.nextRound();  // Переход к следующему раунду
+            messageSender.sendMessage(chatId, "Раунд завершен! Переходите к следующей команде.", null);
+            // Обновляем состояние игры, даем возможность второй команде выбрать тему
+            if ("Team 1".equals(gameState.getCurrentTeam())) {
+                messageSender.sendMessage(chatId, "Теперь ваша очередь выбрать тему.", KeyboardHelper.createThemeSelectionKeyboard());
+            } else {
+                messageSender.sendMessage(chatId, "Теперь ваша очередь! Выберите тему.", KeyboardHelper.createThemeSelectionKeyboard());
+            }
+        }).start();
+    }
+
     public void handleCommand(String command, String chatId) {
         GameState gameState = gameService.getGameState(Long.parseLong(chatId));
         Long chatIdLong = Long.valueOf(chatId);
@@ -72,7 +98,7 @@ public class TelegramCommandHandler {
                         KeyboardHelper.createLobbyMenuKeyboard());
                 break;
 
-            case "создать лобби":  // Убедитесь, что тут правильный регистр и пробелы
+            case "создать лобби":
                 createLobby(chatId);
                 break;
 
@@ -85,40 +111,44 @@ public class TelegramCommandHandler {
                 break;
 
             case "начать игру досрочно":
-                // Досрочное начало игры
-                int lobbyId = gameService.getLobbyIdByChatId(Long.parseLong(chatId)); // Получаем lobbyId по chatId (если нужно)
+                int lobbyId = gameService.getLobbyIdByChatId(Long.parseLong(chatId));
 
                 if (gameService.startGameEarly(lobbyId)) {
-                    // Запрашиваем выбор команды
                     responseMessage = "Игра начнется досрочно! Теперь выберите команду.";
-                    replyMarkup = KeyboardHelper.createTeamSelectionKeyboard(); // Создаем клавиатуру для выбора команды
+                    replyMarkup = KeyboardHelper.createTeamSelectionKeyboard();
                 } else {
                     responseMessage = "Невозможно начать игру досрочно. Лобби слишком мало участников.";
                 }
                 break;
 
-            case "ежиная перхоть":
             case "лосиный сфинктер":
+            case "ежиная перхоть":
                 if (gameState.getTeam1Name() == null) {
                     gameState.selectTeam(command, "Лосиный сфинктер".equals(command) ? "Ежиная перхоть" : "Лосиный сфинктер");
                     responseMessage = "Вы выбрали команду '" + command + "'. Теперь выберите тему игры!";
-                    replyMarkup = KeyboardHelper.createThemeSelectionKeyboard(); // Клавиатура для выбора темы
+                    replyMarkup = KeyboardHelper.createThemeSelectionKeyboard();
                 } else {
-                    responseMessage = "Команды уже выбраны!";
-                    replyMarkup = KeyboardHelper.createStartGameKeyboard(); // Если команды выбраны, предлагаем начать игру
+                    responseMessage = "Команды уже выбраны! Теперь выберите тему.";
+                    replyMarkup = KeyboardHelper.createTeamSelectionKeyboard();
                 }
                 break;
 
             case "технологии":
             case "животные":
             case "еда":
-                if (gameState.getTeam1Name() != null) {
+                if (gameState.getTeam1Name() != null && gameState.getCurrentTheme() == null) {
+                    // Выбор темы для первой команды
                     gameState.selectTheme(command);
                     responseMessage = "Вы выбрали тему '" + command + "'. Теперь игра начнется!";
-                    replyMarkup = KeyboardHelper.createStartGameKeyboard(); // Кнопка для начала игры
+                    replyMarkup = KeyboardHelper.createStartGameKeyboard();
+                } else if (gameState.getTeam2Name() != null && gameState.getCurrentTheme() != null) {
+                    // Выбор темы для второй команды
+                    gameState.selectTheme(command);
+                    responseMessage = "Вы выбрали тему '" + command + "'. Игра начнется!";
+                    replyMarkup = KeyboardHelper.createStartGameKeyboard();
                 } else {
                     responseMessage = "Сначала выберите команду!";
-                    replyMarkup = KeyboardHelper.createTeamSelectionKeyboard(); // Если команда не выбрана, возвращаем к выбору команды
+                    replyMarkup = KeyboardHelper.createTeamSelectionKeyboard();
                 }
                 break;
 
@@ -126,10 +156,11 @@ public class TelegramCommandHandler {
                 if (gameState.getTeam1Name() != null && gameState.getCurrentTheme() != null) {
                     gameState.startGame();
                     responseMessage = "Игра началась! Время пошло!";
-                    replyMarkup = KeyboardHelper.createNextWordKeyboard(); // Кнопка для следующего слова
+                    replyMarkup = KeyboardHelper.createNextWordKeyboard();
+                    startRoundTimer(chatId, gameState); // Запускаем таймер
                 } else {
                     responseMessage = "Для начала игры необходимо выбрать команду и тему!";
-                    replyMarkup = KeyboardHelper.createTeamAndThemeSelectionKeyboard(); // Напоминаем выбрать команду и тему
+                    replyMarkup = KeyboardHelper.createTeamAndThemeSelectionKeyboard();
                 }
                 break;
 

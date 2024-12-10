@@ -201,12 +201,13 @@ public class GameState {
         long remainingTime = ROUND_TIME_LIMIT - elapsedTime;
 
         if (remainingTime <= 0) {
-            switchTeam();
-            roundStartTime = System.currentTimeMillis();
+            switchTeam(); // Переключаем команду, когда время истекло
+            roundStartTime = System.currentTimeMillis(); // Сбрасываем время
             return "Время истекло! Следующий раунд.";
         }
 
         long secondsLeft = remainingTime / 1000;
         return "Осталось времени: " + secondsLeft + " секунд";
     }
+
 }

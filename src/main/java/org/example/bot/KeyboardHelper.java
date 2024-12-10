@@ -15,12 +15,6 @@ public class KeyboardHelper {
         row1.add("Лосиный сфинктер");
         rows.add(row1);
 
-        KeyboardRow row2 = new KeyboardRow();
-        row2.add("Технологии");
-        row2.add("Животные");
-        row2.add("Еда");
-        rows.add(row2);
-
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         keyboardMarkup.setKeyboard(rows);
         keyboardMarkup.setOneTimeKeyboard(true);

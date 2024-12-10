@@ -23,6 +23,8 @@ public class GameState {
     private String currentTeam;
     private static final int MAX_ROUNDS = 6;
     private static final long ROUND_TIME_LIMIT = 30000;
+    private Boolean isTeam1Turn;
+
 
     public GameState() {
         this.words = new ArrayList<>();
@@ -33,6 +35,7 @@ public class GameState {
         this.currentTeam = "Team 1";
         this.currentTheme = null;
         initializeWords();
+        this.isTeam1Turn = true;
     }
 
     public void selectTeam(String team1Name, String team2Name) {
@@ -86,10 +89,6 @@ public class GameState {
 
     public String getCurrentTeam() {
         return currentTeam;
-    }
-
-    public void switchTeam() {
-        currentTeam = currentTeam.equals("Team 1") ? "Team 2" : "Team 1";
     }
 
     public String nextWord(boolean isStartOfRound) {
@@ -192,6 +191,10 @@ public class GameState {
     public void nextRound() {
         currentRound++;
         switchTeam();
+    }
+    public void switchTeam() {
+        this.isTeam1Turn = !this.isTeam1Turn;
+        currentTeam = isTeam1Turn ? "Team 1" : "Team 2";
     }
     public String trackTime() {
         long elapsedTime = System.currentTimeMillis() - roundStartTime;

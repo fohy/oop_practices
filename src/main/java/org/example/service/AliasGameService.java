@@ -12,11 +12,14 @@ public class AliasGameService {
 
     private Map<Long, GameState> gameStates = new HashMap<>();
 
-    private Map<Integer, Lobby> lobbies = new ConcurrentHashMap<>();
 
     private final AtomicInteger lobbyIdCounter = new AtomicInteger(1);
 
+    private final Map<Integer, Lobby> lobbies = new HashMap<>();
 
+    public Lobby getLobbyById(int lobbyId) {
+        return lobbies.get(lobbyId);
+    }
     public GameState getGameState(Long chatId) {
         return gameStates.get(chatId);
     }

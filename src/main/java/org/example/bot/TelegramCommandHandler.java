@@ -2,6 +2,7 @@ package org.example.bot;
 
 import org.example.service.AliasGameService;
 import org.example.service.GameState;
+import org.example.service.Lobby;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
 public class TelegramCommandHandler {
@@ -35,15 +36,34 @@ public class TelegramCommandHandler {
             int lobbyId = Integer.parseInt(lobbyCode.trim());
             Long chatIdLong = Long.parseLong(chatId);
 
+            // Проверка на существование лобби
+            Lobby lobby = gameService.getLobbyById(lobbyId);
+            if (lobby == null) {
+                messageSender.sendMessage(chatId,
+                        "Лобби с кодом " + lobbyId + " не существует. Пожалуйста, попробуйте снова.",
+                        null);
+                return;
+            }
+
+            // Проверка, не полное ли лобби
+            if (lobby.isFull()) {
+                messageSender.sendMessage(chatId,
+                        "Лобби с кодом " + lobbyId + " уже заполнено. Попробуйте войти в другое лобби.",
+                        null);
+                return;
+            }
+
+            // Добавление участника в лобби
             if (gameService.joinLobby(lobbyId, chatIdLong)) {
                 messageSender.sendMessage(chatId,
                         "Вы успешно присоединились к лобби " + lobbyId + "!",
                         KeyboardHelper.createStartGameKeyboard());
             } else {
                 messageSender.sendMessage(chatId,
-                        "Лобби с кодом " + lobbyId + " не существует.",
+                        "Не удалось присоединиться к лобби " + lobbyId + ". Попробуйте снова.",
                         null);
             }
+
         } catch (NumberFormatException e) {
             messageSender.sendMessage(chatId,
                     "Пожалуйста, введите корректный числовой код лобби.",
@@ -52,33 +72,39 @@ public class TelegramCommandHandler {
     }
 
     private void startRoundTimer(String chatId, GameState gameState) {
-
         new Thread(() -> {
             long startTime = System.currentTimeMillis();
-            long timeLimit = 30000;
-            while (System.currentTimeMillis() - startTime < timeLimit) {
+            long timeLimit = 30000;  // Время на каждый ход
 
+            // Игровой цикл
+            while (System.currentTimeMillis() - startTime < timeLimit) {
                 long remainingTime = timeLimit - (System.currentTimeMillis() - startTime);
                 String timeMessage = "Осталось " + remainingTime / 1000 + " секунд.";
                 messageSender.sendMessage(chatId, timeMessage, null);
 
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(10000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
 
+            // Завершаем раунд
             gameState.nextRound();
             messageSender.sendMessage(chatId, "Раунд завершен! Переходите к следующей команде.", null);
 
-            if ("Team 1".equals(gameState.getCurrentTeam())) {
+            // Проверка, какая команда должна играть
+            if ("Лосиный сфинктер".equals(gameState.getCurrentTeam())) {
                 messageSender.sendMessage(chatId, "Теперь ваша очередь выбрать тему.", KeyboardHelper.createThemeSelectionKeyboard());
             } else {
                 messageSender.sendMessage(chatId, "Теперь ваша очередь! Выберите тему.", KeyboardHelper.createThemeSelectionKeyboard());
             }
+
+            // Переключаем на другую команду
+            gameState.switchTeam();
         }).start();
     }
+
 
     public void handleCommand(String command, String chatId) {
         GameState gameState = gameService.getGameState(Long.parseLong(chatId));
@@ -155,25 +181,42 @@ public class TelegramCommandHandler {
                     gameState.startGame();
                     responseMessage = "Игра началась! Время пошло!";
                     replyMarkup = KeyboardHelper.createNextWordKeyboard();
-                    startRoundTimer(chatId, gameState);
+                    startRoundTimer(chatId, gameState);  // Старт таймера для первой команды
                 } else {
                     responseMessage = "Для начала игры необходимо выбрать команду и тему!";
                     replyMarkup = KeyboardHelper.createTeamAndThemeSelectionKeyboard();
                 }
                 break;
+            case "выйти из лобби" :
+                messageSender.sendMessage(chatId, "Возвращаемся в меню!", KeyboardHelper.createLobbyMenuKeyboard());
+                break;
 
             case "следующее":
-                String nextWord = gameState.nextWord(true);
-                responseMessage = nextWord;
+                if ("Team 1".equals(gameState.getCurrentTeam())) {
+                    String nextWord = gameState.nextWord(true);
+                    responseMessage = nextWord;
+                } else {
+                    responseMessage = "Это не ваша очередь!";
+                }
                 break;
 
             case "пропустить":
-                String skipWord = gameState.skipWord();
-                responseMessage = skipWord;
+                if ("Team 1".equals(gameState.getCurrentTeam())) {
+                    String skipWord = gameState.skipWord();
+                    responseMessage = skipWord;
+                } else {
+                    responseMessage = "Это не ваша очередь!";
+                }
                 break;
 
+
             default:
-                responseMessage = "Неизвестная команда!";
+                // Если это не команда, но возможно ввод кода лобби
+                if (command.matches("\\d+")) { // Проверка, что введённый код является числом
+                    handleLobbyCode(chatId, command); // Обрабатываем как код лобби
+                } else {
+                    responseMessage = "Неизвестная команда!";
+                }
                 break;
         }
 

@@ -36,7 +36,6 @@ public class TelegramCommandHandler {
             int lobbyId = Integer.parseInt(lobbyCode.trim());
             Long chatIdLong = Long.parseLong(chatId);
 
-            // Проверка на существование лобби
             Lobby lobby = gameService.getLobbyById(lobbyId);
             if (lobby == null) {
                 messageSender.sendMessage(chatId,
@@ -45,7 +44,6 @@ public class TelegramCommandHandler {
                 return;
             }
 
-            // Проверка, не полное ли лобби
             if (lobby.isFull()) {
                 messageSender.sendMessage(chatId,
                         "Лобби с кодом " + lobbyId + " уже заполнено. Попробуйте войти в другое лобби.",
@@ -53,7 +51,6 @@ public class TelegramCommandHandler {
                 return;
             }
 
-            // Добавление участника в лобби
             if (gameService.joinLobby(lobbyId, chatIdLong)) {
                 messageSender.sendMessage(chatId,
                         "Вы успешно присоединились к лобби " + lobbyId + "!",
@@ -76,7 +73,6 @@ public class TelegramCommandHandler {
             long startTime = System.currentTimeMillis();
             long timeLimit = 30000;  // Время на каждый ход
 
-            // Игровой цикл
             while (System.currentTimeMillis() - startTime < timeLimit) {
                 long remainingTime = timeLimit - (System.currentTimeMillis() - startTime);
                 String timeMessage = "Осталось " + remainingTime / 1000 + " секунд.";
@@ -89,18 +85,15 @@ public class TelegramCommandHandler {
                 }
             }
 
-            // Завершаем раунд
             gameState.nextRound();
             messageSender.sendMessage(chatId, "Раунд завершен! Переходите к следующей команде.", null);
 
-            // Проверка, какая команда должна играть
             if ("Лосиный сфинктер".equals(gameState.getCurrentTeam())) {
                 messageSender.sendMessage(chatId, "Теперь ваша очередь выбрать тему.", KeyboardHelper.createThemeSelectionKeyboard());
             } else {
                 messageSender.sendMessage(chatId, "Теперь ваша очередь! Выберите тему.", KeyboardHelper.createThemeSelectionKeyboard());
             }
 
-            // Переключаем на другую команду
             gameState.switchTeam();
         }).start();
     }
@@ -211,9 +204,8 @@ public class TelegramCommandHandler {
 
 
             default:
-                // Если это не команда, но возможно ввод кода лобби
-                if (command.matches("\\d+")) { // Проверка, что введённый код является числом
-                    handleLobbyCode(chatId, command); // Обрабатываем как код лобби
+                if (command.matches("\\d+")) {
+                    handleLobbyCode(chatId, command);
                 } else {
                     responseMessage = "Неизвестная команда!";
                 }

@@ -26,7 +26,7 @@ public class SkipWordCommand implements Command {
             // Пропускаем слово
             String skippedWord = gameState.skipWord();
             if (skippedWord != null && !skippedWord.isEmpty()) {
-                messageSender.sendMessage(chatId, "Слово пропущено: " + skippedWord, null);
+                messageSender.sendMessage(chatId, skippedWord, null);
             } else {
                 messageSender.sendMessage(chatId, "Слова закончились!", null); // Если слов больше нет
             }

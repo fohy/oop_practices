@@ -63,10 +63,13 @@ public class KeyboardHelper {
     public static ReplyKeyboardMarkup createNextWordKeyboard() {
         List<KeyboardRow> rows = new ArrayList<>();
         KeyboardRow row1 = new KeyboardRow();
+        KeyboardRow row2 = new KeyboardRow();
         row1.add("Следующее");
         row1.add("Пропустить");
         rows.add(row1);
 
+        row2.add("В главное меню");
+        rows.add(row2);
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         keyboardMarkup.setKeyboard(rows);
         return keyboardMarkup;

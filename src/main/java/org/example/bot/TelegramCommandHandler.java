@@ -28,7 +28,7 @@ public class TelegramCommandHandler {
 
         // Специальные команды
         commandMap.put("начать игру досрочно", new StartGameEarlyCommand(gameService, messageSender)); // Используется и gameService, и messageSender
-        commandMap.put("выйти из лобби", new ExitLobbyCommand(messageSender)); // Только messageSender
+        commandMap.put("выйти из лобби",  new ExitLobbyCommand(gameService, messageSender)); // Только messageSender
 
         // Команды для выбора команд
         commandMap.put("лосиный сфинктер", new SelectTeamCommand(gameService, messageSender, "Лосиный сфинктер"));
@@ -43,6 +43,7 @@ public class TelegramCommandHandler {
         commandMap.put("начать игру", new StartGameCommand(gameService, messageSender)); // Используется и gameService, и messageSender
         commandMap.put("следующее", new NextWordCommand(gameService, messageSender)); // Используется и gameService, и messageSender
         commandMap.put("пропустить", new SkipWordCommand(gameService, messageSender)); // Используется и gameService, и messageSender
+        commandMap.put("в главное меню", new DynamicExitCommand(messageSender));
     }
 
     // Метод для обработки команд

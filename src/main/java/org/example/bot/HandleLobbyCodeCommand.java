@@ -19,17 +19,20 @@ public class HandleLobbyCodeCommand implements Command {
             int lobbyId = Integer.parseInt(command.trim());
             Long chatIdLong = Long.parseLong(chatId);
 
+            // Получаем лобби по его коду
             Lobby lobby = gameService.getLobbyById(lobbyId);
             if (lobby == null) {
                 messageSender.sendMessage(chatId, "Лобби с кодом " + lobbyId + " не существует. Пожалуйста, попробуйте снова.", null);
                 return;
             }
 
+            // Проверка на заполненность лобби
             if (lobby.isFull()) {
                 messageSender.sendMessage(chatId, "Лобби с кодом " + lobbyId + " уже заполнено. Попробуйте войти в другое лобби.", null);
                 return;
             }
 
+            // Присоединяем пользователя к лобби
             if (gameService.joinLobby(lobbyId, chatIdLong)) {
                 messageSender.sendMessage(chatId, "Вы успешно присоединились к лобби " + lobbyId + "!", KeyboardHelper.createStartGameKeyboard());
             } else {

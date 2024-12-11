@@ -11,15 +11,60 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class AliasGameService {
 
     private Map<Long, GameState> gameStates = new HashMap<>();
-
-
-    private final AtomicInteger lobbyIdCounter = new AtomicInteger(1);
-
     private final Map<Integer, Lobby> lobbies = new HashMap<>();
 
+    // Создание нового лобби
+    public int createLobby(Long creatorChatId) {
+        int lobbyId = (int) (Math.random() * 10000);  // Простой случайный ID
+        Lobby lobby = new Lobby(lobbyId, creatorChatId);
+        lobbies.put(lobbyId, lobby);
+        return lobbyId;
+    }
+
+    // Получение лобби по ID
     public Lobby getLobbyById(int lobbyId) {
         return lobbies.get(lobbyId);
     }
+
+    // Добавление участника в лобби
+    public boolean joinLobby(int lobbyId, Long chatId) {
+        Lobby lobby = getLobbyById(lobbyId);
+        if (lobby != null && !lobby.isFull()) {
+            return lobby.addParticipant(chatId);
+        }
+        return false;
+    }
+
+    // Поиск лобби по участнику
+    public Lobby getLobbyByParticipant(Long chatId) {
+        for (Lobby lobby : lobbies.values()) {
+            if (lobby.getParticipants().contains(chatId)) {
+                return lobby;
+            }
+        }
+        return null;
+    }
+
+    // Выход из лобби
+    public boolean exitLobby(int lobbyId, Long chatId) {
+        Lobby lobby = getLobbyById(lobbyId);
+        if (lobby != null && lobby.getParticipants().contains(chatId)) {
+            // Убираем участника из лобби
+            lobby.getParticipants().remove(chatId);
+
+            // Если лобби пустое, удаляем его
+            if (lobby.getParticipants().isEmpty()) {
+                lobbies.remove(lobbyId);
+            }
+
+            return true;
+        }
+        return false;
+    }
+
+    private final AtomicInteger lobbyIdCounter = new AtomicInteger(1);
+
+
     public GameState getGameState(Long chatId) {
         return gameStates.get(chatId);
     }
@@ -29,12 +74,6 @@ public class AliasGameService {
     }
 
 
-    public int createLobby(Long creatorChatId) {
-        int newLobbyId = lobbyIdCounter.getAndIncrement();
-        Lobby newLobby = new Lobby(newLobbyId, creatorChatId);
-        lobbies.put(newLobbyId, newLobby);
-        return newLobbyId;
-    }
 
     public int getLobbyIdByChatId(Long chatId) {
         for (Map.Entry<Integer, Lobby> entry : lobbies.entrySet()) {
@@ -74,17 +113,6 @@ public class AliasGameService {
 
         return true;
     }
-
-
-
-    public boolean joinLobby(int lobbyId, Long participantChatId) {
-        Lobby lobby = lobbies.get(lobbyId);
-        if (lobby != null) {
-            return lobby.addParticipant(participantChatId);
-        }
-        return false;
-    }
-
     public List<Long> getLobbyPlayers(int lobbyId) {
         Lobby lobby = lobbies.get(lobbyId);
         if (lobby != null) {

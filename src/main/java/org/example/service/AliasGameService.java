@@ -13,7 +13,6 @@ public class AliasGameService {
     private Map<Long, GameState> gameStates = new HashMap<>();
     private final Map<Integer, Lobby> lobbies = new HashMap<>();
 
-    // Создание нового лобби
     public int createLobby(Long creatorChatId) {
         int lobbyId = (int) (Math.random() * 10000);  // Простой случайный ID
         Lobby lobby = new Lobby(lobbyId, creatorChatId);
@@ -21,12 +20,10 @@ public class AliasGameService {
         return lobbyId;
     }
 
-    // Получение лобби по ID
     public Lobby getLobbyById(int lobbyId) {
         return lobbies.get(lobbyId);
     }
 
-    // Добавление участника в лобби
     public boolean joinLobby(int lobbyId, Long chatId) {
         Lobby lobby = getLobbyById(lobbyId);
         if (lobby != null && !lobby.isFull()) {
@@ -35,7 +32,6 @@ public class AliasGameService {
         return false;
     }
 
-    // Поиск лобби по участнику
     public Lobby getLobbyByParticipant(Long chatId) {
         for (Lobby lobby : lobbies.values()) {
             if (lobby.getParticipants().contains(chatId)) {
@@ -45,14 +41,11 @@ public class AliasGameService {
         return null;
     }
 
-    // Выход из лобби
     public boolean exitLobby(int lobbyId, Long chatId) {
         Lobby lobby = getLobbyById(lobbyId);
         if (lobby != null && lobby.getParticipants().contains(chatId)) {
-            // Убираем участника из лобби
             lobby.getParticipants().remove(chatId);
 
-            // Если лобби пустое, удаляем его
             if (lobby.getParticipants().isEmpty()) {
                 lobbies.remove(lobbyId);
             }

@@ -24,7 +24,7 @@ public class GameState {
     private static final int MAX_ROUNDS = 6;
     private static final long ROUND_TIME_LIMIT = 30000;
     private Boolean isTeam1Turn;
-
+    private int wordsGuessedThisRound;
 
     public GameState() {
         this.words = new ArrayList<>();
@@ -36,6 +36,7 @@ public class GameState {
         this.currentTheme = null;
         initializeWords();
         this.isTeam1Turn = true;
+        this.wordsGuessedThisRound = 0;
     }
 
     public void selectTeam(String team1Name, String team2Name) {
@@ -101,6 +102,7 @@ public class GameState {
         }
 
         String word = words.remove(0);
+        wordsGuessedThisRound++;
         return word;
     }
 
@@ -112,6 +114,7 @@ public class GameState {
         this.words = new ArrayList<>(Arrays.asList("apple", "banana", "cherry", "date"));
         this.round = 0;
         this.gameOver = false;
+        this.wordsGuessedThisRound = 0;
     }
 
     public String skipWord() {
@@ -188,26 +191,30 @@ public class GameState {
     public List<String> getPlayers() {
         return players;
     }
+
     public void nextRound() {
         currentRound++;
+        System.out.println("Раунд " + currentRound + " завершён. Количество правильно отгаданных слов: " + wordsGuessedThisRound);
+        wordsGuessedThisRound = 0;
         switchTeam();
     }
+
     public void switchTeam() {
         this.isTeam1Turn = !this.isTeam1Turn;
         currentTeam = isTeam1Turn ? "Team 1" : "Team 2";
     }
+
     public String trackTime() {
         long elapsedTime = System.currentTimeMillis() - roundStartTime;
         long remainingTime = ROUND_TIME_LIMIT - elapsedTime;
 
         if (remainingTime <= 0) {
-            switchTeam(); // Переключаем команду, когда время истекло
-            roundStartTime = System.currentTimeMillis(); // Сбрасываем время
+            switchTeam();
+            roundStartTime = System.currentTimeMillis();
             return "Время истекло! Следующий раунд.";
         }
 
         long secondsLeft = remainingTime / 1000;
         return "Осталось времени: " + secondsLeft + " секунд";
     }
-
 }

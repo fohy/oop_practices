@@ -22,21 +22,18 @@ public class NextWordCommand implements Command {
             return;
         }
 
-        // Проверяем, чья очередь
         if (gameState.getCurrentTeam().equals("Team 1")) {
-            // Отправляем следующее слово
-            String nextWord = gameState.nextWord(false);  // false, чтобы не увеличивать раунд при каждом слове
+            String nextWord = gameState.nextWord(false);
             if (nextWord != null && !nextWord.isEmpty()) {
                 messageSender.sendMessage(chatId, nextWord, null);
             } else {
-                messageSender.sendMessage(chatId, "Слова закончились!", null); // Если слов больше нет
+                messageSender.sendMessage(chatId, "Слова закончились!", null);
             }
 
-            // Выводим оставшееся время
             String timeRemaining = gameState.trackTime();
             messageSender.sendMessage(chatId, timeRemaining, null);
         } else {
-            messageSender.sendMessage(chatId, "Это не ваша очередь!", null); // Сообщение, если не ваша очередь
+            messageSender.sendMessage(chatId, "Это не ваша очередь!", null);
         }
     }
 }

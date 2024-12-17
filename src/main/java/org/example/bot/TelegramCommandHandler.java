@@ -18,35 +18,27 @@ public class TelegramCommandHandler {
         initCommandMap();
     }
 
-    // Инициализация карты команд
     private void initCommandMap() {
-        // Основные команды
         commandMap.put("/start", new StartCommand(messageSender));
-        commandMap.put("создать лобби", new CreateLobbyCommand(gameService, messageSender)); // Используется и gameService, и messageSender
-        commandMap.put("войти в лобби по коду", new AskForLobbyCodeCommand(messageSender)); // Только messageSender
-        commandMap.put("ввести код лобби", new HandleLobbyCodeCommand(gameService, messageSender)); // Используется и gameService, и messageSender
+        commandMap.put("создать лобби", new CreateLobbyCommand(gameService, messageSender));
+        commandMap.put("войти в лобби по коду", new AskForLobbyCodeCommand(messageSender));
+        commandMap.put("ввести код лобби", new HandleLobbyCodeCommand(gameService, messageSender));
 
-        // Специальные команды
-        commandMap.put("начать игру досрочно", new StartGameEarlyCommand(gameService, messageSender)); // Используется и gameService, и messageSender
-        commandMap.put("выйти из лобби",  new ExitLobbyCommand(gameService, messageSender)); // Только messageSender
+        commandMap.put("начать игру досрочно", new StartGameEarlyCommand(gameService, messageSender));
+        commandMap.put("выйти из лобби", new ExitLobbyCommand(gameService, messageSender));
 
-        // Команды для выбора команд
         commandMap.put("лосиный сфинктер", new SelectTeamCommand(gameService, messageSender, "Лосиный сфинктер"));
         commandMap.put("ежиная перхоть", new SelectTeamCommand(gameService, messageSender, "Ежиная перхоть"));
 
-        // Команды для выбора темы
         commandMap.put("технологии", new SelectThemeCommand(gameService, messageSender, "Технологии"));
         commandMap.put("животные", new SelectThemeCommand(gameService, messageSender, "Животные"));
         commandMap.put("еда", new SelectThemeCommand(gameService, messageSender, "Еда"));
 
-        // Игра
-        commandMap.put("начать игру", new StartGameCommand(gameService, messageSender)); // Используется и gameService, и messageSender
-        commandMap.put("следующее", new NextWordCommand(gameService, messageSender)); // Используется и gameService, и messageSender
-        commandMap.put("пропустить", new SkipWordCommand(gameService, messageSender)); // Используется и gameService, и messageSender
+        commandMap.put("начать игру", new StartGameCommand(gameService, messageSender));
+        commandMap.put("следующее", new NextWordCommand(gameService, messageSender));
+        commandMap.put("пропустить", new SkipWordCommand(gameService, messageSender));
         commandMap.put("в главное меню", new DynamicExitCommand(messageSender));
     }
-
-    // Метод для обработки команд
     public void handleCommand(String command, String chatId) {
         Command commandHandler = commandMap.get(command.toLowerCase());
         if (commandHandler != null) {

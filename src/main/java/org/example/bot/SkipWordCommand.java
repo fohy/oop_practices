@@ -23,19 +23,17 @@ public class SkipWordCommand implements Command {
         }
 
         if (gameState.getCurrentTeam().equals("Team 1")) {
-            // Пропускаем слово
             String skippedWord = gameState.skipWord();
             if (skippedWord != null && !skippedWord.isEmpty()) {
                 messageSender.sendMessage(chatId, skippedWord, null);
             } else {
-                messageSender.sendMessage(chatId, "Слова закончились!", null); // Если слов больше нет
+                messageSender.sendMessage(chatId, "Слова закончились!", null);
             }
 
-            // Выводим оставшееся время
             String timeRemaining = gameState.trackTime();
             messageSender.sendMessage(chatId, timeRemaining, null);
         } else {
-            messageSender.sendMessage(chatId, "Это не ваша очередь!", null); // Сообщение, если не ваша очередь
+            messageSender.sendMessage(chatId, "Это не ваша очередь!", null);
         }
     }
 }
